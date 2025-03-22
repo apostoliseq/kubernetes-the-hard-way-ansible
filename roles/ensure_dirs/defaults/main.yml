@@ -1,8 +1,8 @@
 #SPDX-License-Identifier: MIT-0
 ---
-etcd_dir: /etc/etcd
-certs_dir: /data/certs
-
+# etcd_dir: /etc/etcd
+# certs_dir: /data/certs
+# var_lib_etcd_dir: /var/lib/etcd 
 # # Env vars
 # export PROJECT_DIR=$HOME/projects/kubernetes-the-hard-way
 

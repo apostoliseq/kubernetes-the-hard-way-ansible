@@ -1,0 +1,10 @@
+---
+- name: Ensure directories exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ etcd_dir }}"
+    - "{{ certs_dir }}"
+    - "{{ var_lib_etcd_dir }}"

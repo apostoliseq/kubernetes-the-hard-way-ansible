@@ -1,0 +1,3 @@
+---
+- name: Run generate_encryption-config.sh
+  local_action: shell /home/apostoliseq/projects/kubernetes-the-hard-way/generate_encryption-config.sh

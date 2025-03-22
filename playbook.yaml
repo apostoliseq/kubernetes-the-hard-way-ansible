@@ -1,6 +1,25 @@
 ---
-- name: Ensure directories and configurations exist
-  hosts: cluster
-  become: yes
+# - name: Ensure directories and configurations exist
+#   hosts: cluster
+#   become: yes
+#   roles:
+#     - ensure_dirs
+
+- name: Generate certificates
+  hosts: localhost
   roles:
-    - testrole1
+    - generate_certificates
+    - generate_kubeconfigs
+    - generate_encryption
+
+# - name: Generate kubeconfig
+#   hosts: localhost
+#   tasks:
+#     - name: Run generate_kubeconfig.sh
+#       shell: /home/apostoliseq/projects/kubernetes-the-hard-way/generate_kubeconfig.sh
+
+# - name: Generate kubeconfig
+#   hosts: localhost
+#   tasks:
+#     - name: Run generate_kubeconfig.sh
+#       shell: /home/apostoliseq/projects/kubernetes-the-hard-way/generate_kubeconfig.sh

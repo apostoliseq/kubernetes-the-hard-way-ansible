@@ -45,3 +45,8 @@ ansible all --list-hosts
 ```
 ansible all -m gather_facts
 ```
+
+# Make changes to nodes (elevated ad-hoc)
+```
+ansible all -m apt -a update_cache=true --become --ask-become-pass
+```
