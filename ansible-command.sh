@@ -13,7 +13,7 @@ if [ ! -f "$PLAYBOOK_FILE" ]; then
     exit 1
 fi
 
-ansible-playbook -i inventory.ini "$PLAYBOOK_FILE" "$@"
+ansible-playbook "$PLAYBOOK_FILE" "$@"
 
 # ansible-playbook tags.yml --tags <tag>
 # ansible-playbook tags.yml --list-tags
