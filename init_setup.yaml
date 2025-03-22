@@ -1,0 +1,31 @@
+---
+- name: Create /data/certs directory on all hosts
+  hosts: cluster
+  become: yes
+
+  tasks:
+    - name: Ensure /data/certs directory exists
+      file:
+        path: /data/certs
+        state: directory
+        mode: '0755'
+
+    - name: Generate resources
+      block:
+      - name: Generate Certificates
+        tags: generate_certificates
+      - name: Generate Kubeconfig
+        tags: generate_kubeconfig
+      - name: Generate encryption-config.yaml
+        tags: generate_encryption
+      tags: generate_resources
+
+    - name: Distribute resources
+      block:
+      - name: Distribute Certificates
+        tags: distribute_certificates
+      - name: Distribute Kubeconfig
+        tags: distribute_kubeconfig
+      - name: Distribute encryption-config.yaml
+        tags: distribute_encryption
+      tags: distribute_resources

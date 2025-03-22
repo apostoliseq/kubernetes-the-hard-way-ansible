@@ -1,0 +1,13 @@
+#SPDX-License-Identifier: MIT-0
+---
+- name: Ensure {{ etc_dir }} directory exists
+  file:
+    path: "{{ etc_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Ensure {{ certs_dir }} directory exists
+  file:
+    path: "{{ certs_dir }}"
+    state: directory
+    mode: '0755'

@@ -1,0 +1,6 @@
+---
+- name: Ensure directories and configurations exist
+  hosts: cluster
+  become: yes
+  roles:
+    - testrole1
