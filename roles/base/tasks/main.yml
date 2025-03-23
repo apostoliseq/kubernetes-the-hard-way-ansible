@@ -1,48 +1,40 @@
 ---
-- name: Ensure the Workstation certs directory exists
-  hosts: localhost
-  tasks:
-    - name: Create the certs directory if it doesn't exist
-      file:
-        path: /home/apostoliseq/projects/my-ansible-project/certs
-        state: directory
-        mode: '0755'
+- name: Ensure required directories exist
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ certs_dir }}"
+    - "{{ kubeconfig_dir }}"
 
-    - name: Execute generate_ca.sh
-      shell: /home/apostoliseq/projects/my-ansible-project/generate_scripts/generate_ca.sh
-      args:
-        chdir: /home/apostoliseq/projects/my-ansible-project
+- name: Execute generate_ca.sh
+  shell: "{{ generate_scripts_dir }}/generate_ca.sh"
 
-    - name: Find all other scripts in the generate_scripts directory
-      find:
-        paths: /home/apostoliseq/projects/my-ansible-project/generate_scripts
-        patterns: "*.sh"
-        excludes: "generate_ca.sh"  # Exclude the already executed script
-      register: script_files
+- name: Find all other scripts in the generate_scripts directory
+  find:
+    paths: /home/apostoliseq/projects/my-ansible-project/generate_scripts
+    patterns: "*.sh"
+    excludes: "generate_ca.sh"  # Exclude the already executed script
+  register: script_files
 
-    - name: Execute all other scripts in the generate_scripts directory
-      shell: "{{ item.path }}"
-      args:
-        chdir: /home/apostoliseq/projects/my-ansible-project
-      loop: "{{ script_files.files }}"
+- name: Execute all other scripts in the generate_scripts directory
+  shell: "{{ item.path }}"
+  args:
+    chdir: /home/apostoliseq/projects/my-ansible-project
+  loop: "{{ script_files.files }}"
 
-    - name: Create the kubeconfig directory if it doesn't exist
-      file:
-        path: /home/apostoliseq/projects/my-ansible-project/kubeconfig
-        state: directory
-        mode: '0755'
+- name: Create the kubeconfig directory if it doesn't exist
+  file:
+    path: /home/apostoliseq/projects/my-ansible-project/kubeconfig
+    state: directory
+    mode: '0755'
 
-    - name: Execute set_IPs_in_common_vars.sh
-      shell: /home/apostoliseq/projects/my-ansible-project/set_IPs_in_common_vars.sh
-      args:
-        chdir: /home/apostoliseq/projects/my-ansible-project
+# - name: Execute set_IPs_in_common_vars.sh
+#   shell: .set_IPs_in_common_vars.sh
 
-    - name: Execute generate_kubeconfigs.sh
-      shell: /home/apostoliseq/projects/my-ansible-project/generate_kubeconfigs.sh
-      args:
-        chdir: /home/apostoliseq/projects/my-ansible-project
+- name: Execute generate_kubeconfigs.sh
+  shell: "./generate_kubeconfigs.sh"
 
-    - name: Execute generate_encryption-config.sh
-      shell: /home/apostoliseq/projects/my-ansible-project/generate_encryption-config.sh
-      args:
-        chdir: /home/apostoliseq/projects/my-ansible-project
+- name: Execute generate_encryption-config.sh
+  shell: "./generate_encryption-config.sh"

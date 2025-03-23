@@ -1,3 +1,0 @@
----
-- name: Run generate_kubeconfigs.sh
-  local_action: shell /home/apostoliseq/projects/kubernetes-the-hard-way/generate_kubeconfigs.sh

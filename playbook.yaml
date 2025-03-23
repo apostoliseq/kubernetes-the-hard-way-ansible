@@ -1,16 +1,14 @@
 ---
-# - name: Ensure directories and configurations exist
-#   hosts: cluster
-#   become: yes
+# - name: Generate files
+#   hosts: localhost
 #   roles:
-#     - ensure_dirs
+#     - base
 
-- name: Generate certificates
-  hosts: localhost
+- name: Distribute files to Controllers
+  hosts: controllers
   roles:
-    - generate_certificates
-    - generate_kubeconfigs
-    - generate_encryption
+    - controllers
+
 
 # - name: Generate kubeconfig
 #   hosts: localhost

@@ -1,2 +1,4 @@
-#SPDX-License-Identifier: MIT-0
 ---
+kubeconfig_dir: ./kubeconfigs
+certs_dir: ./certs
+generate_scripts_dir: ./generate_scripts

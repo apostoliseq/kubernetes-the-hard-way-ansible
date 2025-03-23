@@ -1,0 +1,6 @@
+---
+etcd_dir: "/etc/etcd"
+certs_dir_dest: "/data/certs"
+certs_dir_src: "./certs"
+kubeconfig_dir: "{{ project_dir }}/kubeconfig"
+generate_scripts_dir: "{{ project_dir }}/generate_scripts"

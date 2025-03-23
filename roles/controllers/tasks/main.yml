@@ -1,0 +1,54 @@
+---
+- name: Ensure destination directories exist
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '777'
+  loop:
+    - "{{ certs_dir_dest }}"
+    - "{{ etcd_dir }}"
+
+- name: Copy certificates to /data/certs
+  copy:
+    src: "{{ item }}"
+    dest: "{{ certs_dir_dest }}"
+    loop:
+      - "{{ certs_dir_src }}/ca.pem"
+      - "{{ certs_dir_src }}/ca.-key.pem"
+      - "{{ certs_dir_src }}/kube-apiserver.pem"
+      - "{{ certs_dir_src }}/kube-apiserver-key.pem"
+      - "{{ certs_dir_src }}/kube-service-account.pem"
+      - "{{ certs_dir_src }}/kube-service-account-key.pem"
+
+- name: Copy certificates to /etc/etcd
+  copy:
+    src: "{{ item }}"
+    dest: "{{ etcd_dir }}"
+    loop:
+      - "{{ certs_dir_src }}/ca.pem"
+      - "{{ certs_dir_src }}/ca.-key.pem"
+      - "{{ certs_dir_src }}/kube-apiserver.pem"
+      - "{{ certs_dir_src }}/kube-apiserver-key.pem"
+      - "{{ certs_dir_src }}/kube-service-account.pem"
+      - "{{ certs_dir_src }}/kube-service-account-key.pem"
+
+
+# - name: Find required files and register
+#   find:
+#     paths: /home/apostoliseq/projects/my-ansible-project/generate_scripts
+#     patterns: "*.sh"
+#     excludes: "generate_ca.sh"  # Exclude the already executed script
+#   register: script_files
+
+# - name: Copy registered files to {{ certs_dir }}
+#   shell: "{{ item.path }}"
+#   args:
+#     chdir: /home/apostoliseq/projects/my-ansible-project
+#   loop: "{{ script_files.files }}"
+
+# - name: Copy registered files to {{ etcd_dir }}
+#   shell: "{{ item.path }}"
+#   args:
+#     chdir: /home/apostoliseq/projects/my-ansible-project
+#   loop: "{{ script_files.files }}"
