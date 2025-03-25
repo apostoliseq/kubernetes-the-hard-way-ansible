@@ -1,4 +1,5 @@
 ---
 src_certs_dir: ./certs
+src_kubeconfigs_dir: ./kubeconfigs
 dest_certs_dir: /data/certs
 etcd_dir: /etc/etcd
