@@ -1,0 +1,63 @@
+---
+- name: Ensure required directories exist
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ var_lib_kubernetes_dir }}"
+
+- name: Copy required files to {{ var_lib_kubernetes_dir }}
+  become: true
+  copy:
+    src: "{{ certs_dir }}/kube-scheduler.kubeconfig"
+    dest: "{{ var_lib_kubernetes_dir }}/kube-scheduler.kubeconfig"
+    remote_src: true
+    mode: 0644
+
+- name: Ensure /etc/kubernetes/config/kube-scheduler.yaml
+  become: true
+  template:
+    src: kube-scheduler.yaml.j2
+    dest: /etc/kubernetes/config/kube-scheduler.yaml
+    owner: root
+    group: root
+    mode: '0644'
+  vars:
+    kube_scheduler_kubeconfig_path: "/var/lib/kubernetes/kube-scheduler.kubeconfig"
+
+- name: Copy kube-scheduler in /usr/local/bin
+  become: true
+  copy:
+      src: ./downloads/kube-scheduler 
+      dest: /usr/local/bin
+      owner: root
+      group: root
+      mode: '0755'
+
+- name: Create /etc/systemd/system/kube-scheduler.service Unit file 
+  become: true
+  ansible.builtin.template:
+    src: "kube-controller.j2"
+    dest: /etc/systemd/system/kube-scheduler.service
+    mode: '0644'
+  when: "'controller' in inventory_hostname"
+
+- name: Ensure kube-scheduler service is enabled and running
+  become: true
+  block:
+    - name: Reload systemd daemon
+      ansible.builtin.systemd:
+        daemon_reload: yes
+      changed_when: false
+
+    - name: Enable kube-scheduler service
+      ansible.builtin.systemd:
+        name: kube-scheduler
+        enabled: yes
+
+    - name: Start kube-scheduler service
+      ansible.builtin.systemd:
+        name: kube-scheduler
+        state: started

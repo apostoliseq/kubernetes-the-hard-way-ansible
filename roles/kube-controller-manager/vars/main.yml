@@ -1,0 +1,3 @@
+---
+var_lib_kubernetes_dir: /var/lib/kubernetes
+certs_dir: /data/certs

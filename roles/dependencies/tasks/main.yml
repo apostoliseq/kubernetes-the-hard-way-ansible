@@ -1,6 +1,23 @@
 ---
-# To katevazei sto project dir
+- name: Ensure downloads/ exists
+  file:
+    path: ./downloads
+    state: directory
+    mode: '0755'
+
 - name: Ensure downloads
-  shell: |
-    wget -q --show-progress --https-only --timestamping \
-    "https://github.com/coreos/etcd/releases/download/v3.3.5/etcd-v3.3.5-linux-amd64.tar.gz"
+  get_url:
+    url: https://github.com/coreos/etcd/releases/download/v3.3.5/etcd-v3.3.5-linux-amd64.tar.gz
+    dest: ./downloads/etcd-v3.3.5-linux-amd64.tar.gz
+    mode: '0755'
+
+- name: Download kubernetes binaries
+  get_url:
+    url: "https://storage.googleapis.com/kubernetes-release/release/v1.10.2/bin/linux/amd64/{{ item }}"
+    dest: "./downloads/{{ item }}"
+    mode: '0755'
+  loop:
+    - kube-apiserver
+    - kube-controller-manager
+    - kube-scheduler
+    - kubectl

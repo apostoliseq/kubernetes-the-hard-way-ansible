@@ -11,7 +11,7 @@
 - name: Untar etcd-v3.3.5-linux-amd64.tar.gz in /usr/local/bin
   become: true
   unarchive:
-      src: etcd-v3.3.5-linux-amd64.tar.gz 
+      src: ./downloads/etcd-v3.3.5-linux-amd64.tar.gz 
       dest: /usr/local/bin
       extra_opts: [--strip-components=1]
       owner: root
@@ -25,21 +25,22 @@
     dest: /etc/systemd/system/etcd.service
     mode: '0644'
   when: "'controller' in inventory_hostname"
+  # notify: Ensure etcd service is enabled and running
 
-# Na mpoun san handlers
-- name: Reload systemd daemon
+- name: Ensure etcd service is enabled and running
   become: true
-  ansible.builtin.systemd:
-    daemon_reload: yes
+  block:
+    - name: Reload systemd daemon
+      ansible.builtin.systemd:
+        daemon_reload: yes
+      changed_when: false
 
-- name: Enable etcd service
-  become: true
-  ansible.builtin.systemd:
-    name: etcd
-    enabled: yes
+    - name: Enable etcd service
+      ansible.builtin.systemd:
+        name: etcd
+        enabled: yes
 
-- name: Start etcd service
-  become: true
-  ansible.builtin.systemd:
-    name: etcd
-    state: started
+    - name: Start etcd service
+      ansible.builtin.systemd:
+        name: etcd
+        state: started
