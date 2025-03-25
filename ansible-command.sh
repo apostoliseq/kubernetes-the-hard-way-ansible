@@ -1,4 +1,5 @@
 #!/bin/bash
+ansible-playbook playbook.yaml --ask-become-pass
 
 # if [ -z "$1" ]; then
 #     echo "Usage: $0 <playbook-file> [ansible-playbook-options]"
@@ -14,9 +15,6 @@
 # fi
 
 # ansible-playbook "$PLAYBOOK_FILE" "$@"
-
-ansible-playbook playbook.yaml --ask-become-pass
-
 
 # ansible-playbook tags.yml --tags <tag>
 # ansible-playbook tags.yml --list-tags

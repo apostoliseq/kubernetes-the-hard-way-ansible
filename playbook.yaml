@@ -8,17 +8,3 @@
   hosts: cluster
   roles:
     - distribute
-
-
-
-# - name: Generate kubeconfig
-#   hosts: localhost
-#   tasks:
-#     - name: Run generate_kubeconfig.sh
-#       shell: /home/apostoliseq/projects/kubernetes-the-hard-way/generate_kubeconfig.sh
-
-# - name: Generate kubeconfig
-#   hosts: localhost
-#   tasks:
-#     - name: Run generate_kubeconfig.sh
-#       shell: /home/apostoliseq/projects/kubernetes-the-hard-way/generate_kubeconfig.sh
