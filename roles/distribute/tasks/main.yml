@@ -128,3 +128,20 @@
     - kube-proxy.kubeconfig
     - "{{ inventory_hostname }}.kubeconfig"
   when: "'worker' in inventory_hostname"
+
+# Distribute encryption-config.yaml
+- name: Distribute controller encryption-config.yaml to /data/certs
+  become: true
+  copy:
+    src: "encryption-config.yaml"
+    dest: "{{ dest_certs_dir }}/encryption-config.yaml"
+    mode: 0644
+  when: "'controller' in inventory_hostname"
+
+- name: Distribute controller encryption-config.yaml to /etc/etcd
+  become: true
+  copy:
+    src: "encryption-config.yaml"
+    dest: "{{ etcd_dir }}/encryption-config.yaml"
+    mode: 0644
+  when: "'controller' in inventory_hostname"
