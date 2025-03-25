@@ -2,12 +2,13 @@
 - name: Generate files
   hosts: localhost
   roles:
-    - base
+    - generate
 
-# - name: Distribute files to Controllers
-#   hosts: controllers
-#   roles:
-#     - controllers
+- name: Distribute files
+  hosts: cluster
+  roles:
+    - distribute
+
 
 
 # - name: Generate kubeconfig

@@ -15,7 +15,7 @@
 
 # ansible-playbook "$PLAYBOOK_FILE" "$@"
 
-ansible-playbook playbook.yaml
+ansible-playbook playbook.yaml --ask-become-pass
 
 
 # ansible-playbook tags.yml --tags <tag>

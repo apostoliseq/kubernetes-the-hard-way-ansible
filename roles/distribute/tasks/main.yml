@@ -1,0 +1,91 @@
+---
+# Copy files from certs/ to /data/certs /etc/etcd"
+# Copy files from kubeconfigs/ /data/certs /etc/etcd"
+
+- name: Ensure required directories exist
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ dest_certs_dir }}"
+    - "{{ etcd_dir }}"
+
+- name: Distribute controller certs to /data/certs
+  become: true
+  copy:
+    src: "{{ src_certs_dir }}/{{ item }}"
+    dest: "{{ dest_certs_dir }}/{{ item }}"
+    mode: 0644
+  loop:
+    - ca-key.pem
+    - ca.pem
+    - kube-apiserver-key.pem
+    - kube-apiserver.pem
+    - kube-service-account-key.pem
+    - kube-service-account.pem
+  when: "'controller' in inventory_hostname"
+
+- name: Distribute controller certs to /etc/etcd
+  become: true
+  copy:
+    src: "{{ src_certs_dir }}/{{ item }}"
+    dest: "{{ etcd_dir }}/{{ item }}"
+    mode: 0644
+  loop:
+    - ca-key.pem
+    - ca.pem
+    - kube-apiserver-key.pem
+    - kube-apiserver.pem
+    - kube-service-account-key.pem
+    - kube-service-account.pem
+  when: "'controller' in inventory_hostname"
+
+- name: Distribute worker certs to /data/certs
+  become: true
+  copy:
+    src: "{{ src_certs_dir }}/{{ item }}"
+    dest: "{{ dest_certs_dir }}/{{ item }}"
+    mode: 0644
+  loop:
+    - ca.pem
+    - "{{ inventory_hostname }}-key.pem"
+    - "{{ inventory_hostname }}.pem"
+  when: "'worker' in inventory_hostname"
+
+- name: Distribute worker certs to /etc/etcd
+  become: true
+  copy:
+    src: "{{ src_certs_dir }}/{{ item }}"
+    dest: "{{ etcd_dir }}/{{ item }}"
+    mode: 0644
+  loop:
+    - ca.pem
+    - "{{ inventory_hostname }}-key.pem"
+    - "{{ inventory_hostname }}.pem"
+  when: "'worker' in inventory_hostname"
+
+# - name: Distribute loadbalancer certs to /data/certs
+#   become: true
+#   copy:
+#     src: "{{ src_certs_dir }}/{{ item }}"
+#     dest: "{{ dest_certs_dir }}/{{ item }}"
+#     mode: 0644
+#   loop:
+#     - ca.pem
+#     - "{{ inventory_hostname }}-key.pem"
+#     - "{{ inventory_hostname }}.pem"
+#   when: "'loadbalancer' in inventory_hostname"
+
+# - name: Distribute loadbalancer certs to /etc/etcd
+#   become: true
+#   copy:
+#     src: "{{ src_certs_dir }}/{{ item }}"
+#     dest: "{{ etcd_dir }}/{{ item }}"
+#     mode: 0644
+#   loop:
+#     - ca.pem
+#     - "{{ inventory_hostname }}-key.pem"
+#     - "{{ inventory_hostname }}.pem"
+#   when: "'loadbalancer' in inventory_hostname"

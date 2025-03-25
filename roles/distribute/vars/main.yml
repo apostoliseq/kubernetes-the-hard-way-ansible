@@ -1,0 +1,4 @@
+---
+src_certs_dir: ./certs
+dest_certs_dir: /data/certs
+etcd_dir: /etc/etcd
