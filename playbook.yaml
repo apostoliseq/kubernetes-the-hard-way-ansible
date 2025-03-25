@@ -8,3 +8,8 @@
   hosts: cluster
   roles:
     - distribute
+
+- name: Install etcd
+  hosts: controllers
+  roles:
+    - etcd
