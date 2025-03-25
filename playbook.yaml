@@ -1,4 +1,9 @@
 ---
+- name: Ensure dependencies
+  hosts: localhost
+  roles:
+    - dependencies
+
 - name: Generate files
   hosts: localhost
   roles:

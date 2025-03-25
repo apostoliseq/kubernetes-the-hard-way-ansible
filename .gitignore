@@ -2,3 +2,4 @@ certs/
 csr/
 kubeconfigs/
 encryption-config.yaml
+etcd-v3.3.5-linux-amd64.tar.gz
