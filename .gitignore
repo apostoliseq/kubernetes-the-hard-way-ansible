@@ -1,3 +1,4 @@
 certs/
-kubeconfig/
+csr/
+kubeconfigs/
 encryption-config.yaml

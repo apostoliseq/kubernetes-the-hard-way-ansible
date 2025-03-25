@@ -5,36 +5,246 @@
     state: directory
     mode: '0755'
   loop:
+    - "{{ csr_dir }}"
     - "{{ certs_dir }}"
     - "{{ kubeconfig_dir }}"
 
-- name: Execute generate_ca.sh
-  shell: "{{ generate_scripts_dir }}/generate_ca.sh"
+- name: Create ca-config.json in csr/
+  ansible.builtin.template:
+    src: config.j2
+    dest: "{{ csr_dir }}/ca-config.json"
+    mode: '0644'
 
-- name: Find all other scripts in the generate_scripts directory
-  find:
-    paths: /home/apostoliseq/projects/my-ansible-project/generate_scripts
-    patterns: "*.sh"
-    excludes: "generate_ca.sh"  # Exclude the already executed script
-  register: script_files
+- name: Create -csr.json files in csr/
+  ansible.builtin.template:
+    src: "{{ item }}-csr.j2"
+    dest: "{{ csr_dir }}/{{ item }}-csr.json"
+    mode: '0644'
+  loop:
+    - ca
+    - kube-admin
+    - kube-apiserver
+    - kube-controller-manager
+    - kube-proxy
+    - kube-scheduler
+    - kube-service-account
+    - kube-worker-1
+    - kube-worker-2
 
-- name: Execute all other scripts in the generate_scripts directory
-  shell: "{{ item.path }}"
-  args:
-    chdir: /home/apostoliseq/projects/my-ansible-project
-  loop: "{{ script_files.files }}"
+- name: Generete a self-signed CA certificate using the CSR defined in ca-csr.json
+  shell: |
+    cfssl gencert -initca {{ csr_dir }}/ca-csr.json | cfssljson -bare {{ certs_dir }}/ca
+  register: "output"
 
-- name: Create the kubeconfig directory if it doesn't exist
-  file:
-    path: /home/apostoliseq/projects/my-ansible-project/kubeconfig
-    state: directory
-    mode: '0755'
+- name: Generete the kube-apiserver certificate, signed by the CA created in generate_ca.sh
+  shell: |
+    cfssl gencert \
+    -ca={{ certs_dir }}/ca.pem \
+    -ca-key={{ certs_dir }}/ca-key.pem \
+    -config={{ csr_dir }}/ca-config.json \
+    -hostname=10.32.0.1,192.168.225.146,kube-controller-1,192.168.225.147,kube-controller-2,192.168.225.150,kube-loadbalancer,127.0.0.1,localhost,kubernetes.default \
+    -profile=kubernetes \
+    {{ csr_dir }}/kube-apiserver-csr.json | cfssljson -bare {{ certs_dir }}/kube-apiserver
 
-# - name: Execute set_IPs_in_common_vars.sh
-#   shell: .set_IPs_in_common_vars.sh
+- name: Generete the kube-service-account certificate, signed by the CA created in generate_ca.sh
+  shell: |
+    cfssl gencert \
+    -ca={{ certs_dir }}/ca.pem \
+    -ca-key={{ certs_dir }}/ca-key.pem \
+    -config={{ csr_dir }}/ca-config.json \
+    -hostname=10.32.0.1,192.168.225.146,kube-controller-1,192.168.225.147,kube-controller-2,192.168.225.150,kube-loadbalancer,127.0.0.1,localhost,kubernetes.default \
+    -profile=kubernetes \
+    {{ csr_dir }}/kube-service-account-csr.json | cfssljson -bare {{ certs_dir }}/kube-service-account
 
-- name: Execute generate_kubeconfigs.sh
-  shell: "./generate_kubeconfigs.sh"
+- name: Generete the kube-worker-1 certificate, signed by the CA created in generate_ca.sh
+  shell: |
+    cfssl gencert \
+    -ca={{ certs_dir }}/ca.pem \
+    -ca-key={{ certs_dir }}/ca-key.pem \
+    -config={{ csr_dir }}/ca-config.json \
+    -hostname=kube-worker-1 \
+    -profile=kubernetes \
+    {{ csr_dir }}/kube-worker-1-csr.json | cfssljson -bare {{ certs_dir }}/kube-worker-1
 
-- name: Execute generate_encryption-config.sh
-  shell: "./generate_encryption-config.sh"
+- name: Generete the kube-worker-2 certificate, signed by the CA created in generate_ca.sh
+  shell: |
+    cfssl gencert \
+    -ca={{ certs_dir }}/ca.pem \
+    -ca-key={{ certs_dir }}/ca-key.pem \
+    -config={{ csr_dir }}/ca-config.json \
+    -hostname=kube-worker-2 \
+    -profile=kubernetes \
+    {{ csr_dir }}/kube-worker-2-csr.json | cfssljson -bare {{ certs_dir }}/kube-worker-2
+
+- name: Generete the kube-admin certificate, signed by the CA created in generate_ca.sh
+  shell: |
+    cfssl gencert \
+    -ca={{ certs_dir }}/ca.pem \
+    -ca-key={{ certs_dir }}/ca-key.pem \
+    -config={{ csr_dir }}/ca-config.json \
+    -profile=kubernetes \
+    {{ csr_dir }}/kube-admin-csr.json | cfssljson -bare {{ certs_dir }}/kube-admin
+
+- name: Generete the kube-controller-manager certificate, signed by the CA created in generate_ca.sh
+  shell: |
+    cfssl gencert \
+    -ca={{ certs_dir }}/ca.pem \
+    -ca-key={{ certs_dir }}/ca-key.pem \
+    -config={{ csr_dir }}/ca-config.json \
+    -profile=kubernetes \
+    {{ csr_dir }}/kube-controller-manager-csr.json | cfssljson -bare {{ certs_dir }}/kube-controller-manager
+
+- name: Generete the kube-proxy certificate, signed by the CA created in generate_ca.sh
+  shell: |
+    cfssl gencert \
+    -ca={{ certs_dir }}/ca.pem \
+    -ca-key={{ certs_dir }}/ca-key.pem \
+    -config={{ csr_dir }}/ca-config.json \
+    -profile=kubernetes \
+    {{ csr_dir }}/kube-proxy-csr.json | cfssljson -bare {{ certs_dir }}/kube-proxy
+
+- name: Generete the kube-scheduler certificate, signed by the CA created in generate_ca.sh
+  shell: |
+    cfssl gencert \
+    -ca={{ certs_dir }}/ca.pem \
+    -ca-key={{ certs_dir }}/ca-key.pem \
+    -config={{ csr_dir }}/ca-config.json \
+    -profile=kubernetes \
+    {{ csr_dir }}/kube-scheduler-csr.json | cfssljson -bare {{ certs_dir }}/kube-scheduler
+
+- name: Generate the kube-worker-1 kubeconfig
+  shell: |
+    kubectl config set-cluster {{ cluster_name }} \
+    --certificate-authority={{ certs_dir }}/ca.pem \
+    --embed-certs=true \
+    --server=https://{{ kube_loadbalancer }}:6443 \
+    --kubeconfig={{ kubeconfig_dir }}/kube-worker-1.kubeconfig
+    
+    kubectl config set-credentials system:node:kube-worker-1 \
+    --client-certificate={{ certs_dir }}/kube-worker-1.pem \
+    --client-key={{ certs_dir }}/kube-worker-1-key.pem \
+    --embed-certs=true \
+    --kubeconfig={{ kubeconfig_dir }}/kube-worker-1.kubeconfig
+
+    kubectl config set-context default \
+    --cluster={{ cluster_name }} \
+    --user=system:node:kube-worker-1 \
+    --kubeconfig={{ kubeconfig_dir }}/kube-worker-1.kubeconfig
+    
+    kubectl config use-context default --kubeconfig={{ kubeconfig_dir }}/kube-worker-1.kubeconfig
+
+- name: Generate the kube-worker-2 kubeconfig
+  shell: |
+    kubectl config set-cluster {{ cluster_name }} \
+    --certificate-authority={{ certs_dir }}/ca.pem \
+    --embed-certs=true \
+    --server=https://{{ kube_loadbalancer }}:6443 \
+    --kubeconfig={{ kubeconfig_dir }}/kube-worker-2.kubeconfig
+    
+    kubectl config set-credentials system:node:kube-worker-2 \
+    --client-certificate={{ certs_dir }}/kube-worker-2.pem \
+    --client-key={{ certs_dir }}/kube-worker-2-key.pem \
+    --embed-certs=true \
+    --kubeconfig={{ kubeconfig_dir }}/kube-worker-2.kubeconfig
+
+    kubectl config set-context default \
+    --cluster={{ cluster_name }} \
+    --user=system:node:kube-worker-2 \
+    --kubeconfig={{ kubeconfig_dir }}/kube-worker-2.kubeconfig
+    
+    kubectl config use-context default --kubeconfig={{ kubeconfig_dir }}/kube-worker-2.kubeconfig
+
+- name: Generate the kube-proxy kubeconfig
+  shell: |
+    kubectl config set-cluster {{ cluster_name }} \
+    --certificate-authority={{ certs_dir }}/ca.pem \
+    --embed-certs=true \
+    --server=https://{{ kube_loadbalancer }}:6443 \
+    --kubeconfig={{ kubeconfig_dir }}/kube-proxy.kubeconfig
+    
+    kubectl config set-credentials system:node:kube-proxy \
+    --client-certificate={{ certs_dir }}/kube-proxy.pem \
+    --client-key={{ certs_dir }}/kube-proxy-key.pem \
+    --embed-certs=true \
+    --kubeconfig={{ kubeconfig_dir }}/kube-proxy.kubeconfig
+
+    kubectl config set-context default \
+    --cluster={{ cluster_name }} \
+    --user=system:node:kube-proxy \
+    --kubeconfig={{ kubeconfig_dir }}/kube-proxy.kubeconfig
+    
+    kubectl config use-context default --kubeconfig={{ kubeconfig_dir }}/kube-proxy.kubeconfig
+
+- name: Generate the kube-controller-manager kubeconfig
+  shell: |
+    kubectl config set-cluster {{ cluster_name }} \
+    --certificate-authority={{ certs_dir }}/ca.pem \
+    --embed-certs=true \
+    --server=https://127.0.0.1:6443 \
+    --kubeconfig={{ kubeconfig_dir }}/kube-controller-manager.kubeconfig
+    
+    kubectl config set-credentials system:kube-controller-manager \
+    --client-certificate={{ certs_dir }}/kube-controller-manager.pem \
+    --client-key={{ certs_dir }}/kube-controller-manager-key.pem \
+    --embed-certs=true \
+    --kubeconfig={{ kubeconfig_dir }}/kube-controller-manager.kubeconfig
+
+    kubectl config set-context default \
+    --cluster={{ cluster_name }} \
+    --user=system:kube-controller-manager \
+    --kubeconfig={{ kubeconfig_dir }}/kube-controller-manager.kubeconfig
+    
+    kubectl config use-context default --kubeconfig={{ kubeconfig_dir }}/kube-controller-manager.kubeconfig
+
+- name: Generate the kube-scheduler kubeconfig
+  shell: |
+    kubectl config set-cluster {{ cluster_name }} \
+    --certificate-authority={{ certs_dir }}/ca.pem \
+    --embed-certs=true \
+    --server=https://127.0.0.1:6443 \
+    --kubeconfig={{ kubeconfig_dir }}/kube-scheduler.kubeconfig
+    
+    kubectl config set-credentials system:kube-scheduler \
+    --client-certificate={{ certs_dir }}/kube-scheduler.pem \
+    --client-key={{ certs_dir }}/kube-scheduler-key.pem \
+    --embed-certs=true \
+    --kubeconfig={{ kubeconfig_dir }}/kube-scheduler.kubeconfig
+
+    kubectl config set-context default \
+    --cluster={{ cluster_name }} \
+    --user=system:kube-scheduler \
+    --kubeconfig={{ kubeconfig_dir }}/kube-scheduler.kubeconfig
+    
+    kubectl config use-context default --kubeconfig={{ kubeconfig_dir }}/kube-scheduler.kubeconfig
+
+- name: Generate the kube-admin kubeconfig
+  shell: |
+    kubectl config set-cluster {{ cluster_name }} \
+    --certificate-authority={{ certs_dir }}/ca.pem \
+    --embed-certs=true \
+    --server=https://127.0.0.1:6443 \
+    --kubeconfig={{ kubeconfig_dir }}/kube-admin.kubeconfig
+    
+    kubectl config set-credentials kube-admin \
+    --client-certificate={{ certs_dir }}/kube-admin.pem \
+    --client-key={{ certs_dir }}/kube-admin-key.pem \
+    --embed-certs=true \
+    --kubeconfig={{ kubeconfig_dir }}/kube-admin.kubeconfig
+
+    kubectl config set-context default \
+    --cluster={{ cluster_name }} \
+    --user=kube-admin \
+    --kubeconfig={{ kubeconfig_dir }}/kube-admin.kubeconfig
+    
+    kubectl config use-context default --kubeconfig={{ kubeconfig_dir }}/kube-admin.kubeconfig
+
+- name: Generate the encryption-config.yaml
+  shell: head -c 32 /dev/urandom | base64
+  register: encryption_key
+  changed_when: false
+
+- name: Create encryption-config.yaml
+  template:
+    src: encryption-config.j2
+    dest: "./encryption-config.yaml"
+    mode: 0600

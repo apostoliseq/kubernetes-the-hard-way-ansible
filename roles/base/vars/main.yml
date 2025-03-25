@@ -1,4 +1,12 @@
 ---
-kubeconfig_dir: ./kubeconfigs
 certs_dir: ./certs
+csr_dir: ./csr
+kubeconfig_dir: ./kubeconfigs
 generate_scripts_dir: ./generate_scripts
+
+cluster_name: "kubernetes-the-hard-way"
+# ca_cert: .
+# ca_key: -ca-key=${CA_KEY} \
+# ca_config: -config=${CA_CONFIG} \
+# cert_hostname: -hostname=${CERT_HOSTNAME} \
+# profile: -profile=${PROFILE} \

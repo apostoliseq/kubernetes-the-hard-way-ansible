@@ -1,19 +1,22 @@
 #!/bin/bash
 
-if [ -z "$1" ]; then
-    echo "Usage: $0 <playbook-file> [ansible-playbook-options]"
-    exit 1
-fi
+# if [ -z "$1" ]; then
+#     echo "Usage: $0 <playbook-file> [ansible-playbook-options]"
+#     exit 1
+# fi
 
-PLAYBOOK_FILE="$1"
-shift  # Remove the first argument (playbook file) to pass the rest to ansible-playbook
+# PLAYBOOK_FILE="$1"
+# shift  # Remove the first argument (playbook file) to pass the rest to ansible-playbook
 
-if [ ! -f "$PLAYBOOK_FILE" ]; then
-    echo "Error: Playbook file '$PLAYBOOK_FILE' not found!"
-    exit 1
-fi
+# if [ ! -f "$PLAYBOOK_FILE" ]; then
+#     echo "Error: Playbook file '$PLAYBOOK_FILE' not found!"
+#     exit 1
+# fi
 
-ansible-playbook "$PLAYBOOK_FILE" "$@"
+# ansible-playbook "$PLAYBOOK_FILE" "$@"
+
+ansible-playbook playbook.yaml
+
 
 # ansible-playbook tags.yml --tags <tag>
 # ansible-playbook tags.yml --list-tags

@@ -1,13 +1,13 @@
 ---
-# - name: Generate files
-#   hosts: localhost
-#   roles:
-#     - base
-
-- name: Distribute files to Controllers
-  hosts: controllers
+- name: Generate files
+  hosts: localhost
   roles:
-    - controllers
+    - base
+
+# - name: Distribute files to Controllers
+#   hosts: controllers
+#   roles:
+#     - controllers
 
 
 # - name: Generate kubeconfig
