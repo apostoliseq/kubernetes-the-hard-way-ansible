@@ -1,18 +1,18 @@
 ---
-# - name: Ensure dependencies
-#   hosts: localhost
-#   roles:
-#     - dependencies
+- name: Ensure dependencies
+  hosts: localhost
+  roles:
+    - dependencies
 
-# - name: Generate files
-#   hosts: localhost
-#   roles:
-#     - generate
+- name: Generate files
+  hosts: localhost
+  roles:
+    - generate
 
-# - name: Distribute files
-#   hosts: cluster
-#   roles:
-#     - distribute
+- name: Distribute files
+  hosts: cluster
+  roles:
+    - distribute
 
 - name: Install kube-controllers
   hosts: controllers

@@ -1,5 +1,5 @@
 {
-    "CN": "kube-service-accounts",
+    "CN": "{{ kube_components[component].cn }}",
     "key": {
         "algo": "rsa",
         "size": 2048
@@ -9,8 +9,8 @@
         {
             "C": "Greece",
             "L": "Evoia",
-            "O": "Kubernetes",
-            "OU": "Kubernetes The Hard Way",
+            "O": "{{ kube_components[component].o }}",
+            "OU": "{{ kube_components[component].ou }}",
             "ST": "Chalcis"
         }
     ]

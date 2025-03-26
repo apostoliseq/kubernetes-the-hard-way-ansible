@@ -28,7 +28,7 @@
 - name: Create /etc/systemd/system/kube-controller-manager.service Unit file 
   become: true
   ansible.builtin.template:
-    src: "kube-controller.j2"
+    src: "kube-controller-manager.j2"
     dest: /etc/systemd/system/kube-controller-manager.service
     mode: '0644'
   when: "'controller' in inventory_hostname"

@@ -1,5 +1,6 @@
 ---
 - name: Ensure required directories exist
+  become: true
   file:
     path: "{{ item }}"
     state: directory
@@ -21,8 +22,9 @@
 - name: Create /etc/systemd/system/etcd.service Unit file 
   become: true
   ansible.builtin.template:
-    src: "{{ inventory_hostname }}.j2"
+    src: "etcd.j2"
     dest: /etc/systemd/system/etcd.service
+    force: yes
     mode: '0644'
   when: "'controller' in inventory_hostname"
   # notify: Ensure etcd service is enabled and running

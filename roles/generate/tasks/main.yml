@@ -11,25 +11,18 @@
 
 - name: Create ca-config.json in csr/
   ansible.builtin.template:
-    src: config.j2
+    src: ca-config.j2
     dest: "{{ csr_dir }}/ca-config.json"
     mode: '0644'
 
 - name: Create -csr.json files in csr/
   ansible.builtin.template:
-    src: "{{ item }}-csr.j2"
-    dest: "{{ csr_dir }}/{{ item }}-csr.json"
+    src: "csr.j2"
+    dest: "{{ csr_dir }}/{{ component }}-csr.json"
     mode: '0644'
-  loop:
-    - ca
-    - kube-admin
-    - kube-apiserver
-    - kube-controller-manager
-    - kube-proxy
-    - kube-scheduler
-    - kube-service-account
-    - kube-worker-1
-    - kube-worker-2
+  vars:
+    component: "{{ item }}"
+  loop: "{{ kube_components.keys() | list }}"
 
 - name: Generete a self-signed CA certificate using the CSR defined in ca-csr.json
   shell: |

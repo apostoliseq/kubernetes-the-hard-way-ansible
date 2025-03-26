@@ -5,8 +5,41 @@ kubeconfig_dir: ./kubeconfigs
 generate_scripts_dir: ./generate_scripts
 
 cluster_name: "kubernetes-the-hard-way"
-# ca_cert: .
-# ca_key: -ca-key=${CA_KEY} \
-# ca_config: -config=${CA_CONFIG} \
-# cert_hostname: -hostname=${CERT_HOSTNAME} \
-# profile: -profile=${PROFILE} \
+
+kube_components:
+  ca:
+    cn: "Kubernetes"
+    o: "Kubernetes"
+    ou: "CA"
+  kube-admin:
+    cn: "kube-admin"
+    o: "system:masters"
+    ou: "Kubernetes The Hard Way"
+  kube-apiserver:
+    cn: "system:kube-apiserver"
+    o: "Kubernetes"
+    ou: "Kubernetes The Hard Way"
+  kube-controller-manager:
+    cn: "system:kube-controller-manager"
+    o: "system:kube-controller-manager"
+    ou: "Kubernetes The Hard Way"
+  kube-scheduler:
+    cn: "system:kube-scheduler"
+    o: "system:kube-scheduler"
+    ou: "Kubernetes The Hard Way"
+  kube-proxy:
+    cn: "system:kube-proxy"
+    o: "system:node-proxier"
+    ou: "Kubernetes The Hard Way"
+  kube-service-account:
+    cn: "kube-service-accounts"
+    o: "Kubernetes"
+    ou: "Kubernetes The Hard Way"
+  kube-worker-1:
+    cn: "system:node:kube-worker-1"
+    o: "system:nodes"
+    ou: "Kubernetes The Hard Way"
+  kube-worker-2:
+    cn: "system:node:kube-worker-2"
+    o: "system:nodes"
+    ou: "Kubernetes The Hard Way"
