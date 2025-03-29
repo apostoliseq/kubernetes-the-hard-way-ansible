@@ -144,9 +144,11 @@ hosts
 >  IdentityFile ~/.ssh/ed25519-Github
 ```
 * * *
-> Git clone
+> Git clone && init setup
 
 - **kube-workstation [~]**
 	- `mkdir projects`
 	- `cd projects`
 	- `git clone ssh://Github/<USER>/kubernetes-the-hard-way-ansible`
+	-  `git config --global user.email example@email`
+	-  `git config --global user.name <USER>>`
