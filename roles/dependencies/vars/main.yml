@@ -1,0 +1,3 @@
+---
+etcd_version: 3.3.5
+component_version: 1.10.2

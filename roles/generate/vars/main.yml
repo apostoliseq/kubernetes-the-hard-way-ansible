@@ -5,19 +5,24 @@ kubeconfig_dir: ./kubeconfigs
 generate_scripts_dir: ./generate_scripts
 
 cluster_name: "kubernetes-the-hard-way"
+profile: "kubernetes"
 
 kube_components:
   ca:
     cn: "Kubernetes"
     o: "Kubernetes"
     ou: "CA"
-  kube-admin:
-    cn: "kube-admin"
+  admin:
+    cn: "admin"
     o: "system:masters"
     ou: "Kubernetes The Hard Way"
-  kube-apiserver:
-    cn: "system:kube-apiserver"
-    o: "Kubernetes"
+  kube-worker-1:
+    cn: "system:node:kube-worker-1"
+    o: "system:nodes"
+    ou: "Kubernetes The Hard Way"
+  kube-worker-2:
+    cn: "system:node:kube-worker-2"
+    o: "system:nodes"
     ou: "Kubernetes The Hard Way"
   kube-controller-manager:
     cn: "system:kube-controller-manager"
@@ -31,15 +36,11 @@ kube_components:
     cn: "system:kube-proxy"
     o: "system:node-proxier"
     ou: "Kubernetes The Hard Way"
-  kube-service-account:
-    cn: "kube-service-accounts"
+  kubernetes:
+    cn: "kubernetes"
     o: "Kubernetes"
     ou: "Kubernetes The Hard Way"
-  kube-worker-1:
-    cn: "system:node:kube-worker-1"
-    o: "system:nodes"
-    ou: "Kubernetes The Hard Way"
-  kube-worker-2:
-    cn: "system:node:kube-worker-2"
-    o: "system:nodes"
+  service-account:
+    cn: "service-accounts"
+    o: "Kubernetes"
     ou: "Kubernetes The Hard Way"

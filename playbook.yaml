@@ -26,6 +26,6 @@
   
   roles:
     - etcd
-    - kube-apiserver
+    - kubernetes
     - kube-controller-manager
     - kube-scheduler

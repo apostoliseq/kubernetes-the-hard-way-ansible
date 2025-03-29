@@ -1,0 +1,44 @@
+- name: Generete a self-signed CA certificate using the CSR defined in ca-csr.json
+  shell: |
+    cfssl gencert -initca {{ csr_dir }}/ca-csr.json | cfssljson -bare {{ certs_dir }}/ca
+  register: "output"
+
+- name: Generete the admin certificate, signed by the CA
+  shell: |
+    cfssl gencert \
+    -ca={{ certs_dir }}/ca.pem \
+    -ca-key={{ certs_dir }}/ca-key.pem \
+    -config={{ csr_dir }}/ca-config.json \
+    -profile={{ profile }} \
+    {{ csr_dir }}/admin-csr.json | cfssljson -bare {{ certs_dir }}/admin
+
+- name: Generete certificates that use -hostname, signed by the CA
+  shell: |
+    cfssl gencert \
+    -ca={{ certs_dir }}/ca.pem \
+    -ca-key={{ certs_dir }}/ca-key.pem \
+    -config={{ csr_dir }}/ca-config.json \
+    -hostname={{ item.hostnames }} \
+    -profile={{ profile }} \
+    {{ csr_dir }}/{{ item.name }}-csr.json | cfssljson -bare {{ certs_dir }}/{{ item.name }}
+  loop:
+    - name: "kube-worker-1"
+      hostnames: "{{ hostvars['kube-worker-1']['ansible_host'] }},kube-worker-1"
+    - name: "kube-worker-2"
+      hostnames: "{{ hostvars['kube-worker-2']['ansible_host'] }},kube-worker-2"
+    - name: "kubernetes"
+      hostnames: "10.32.0.1,{{ hostvars['kube-controller-1']['ansible_host'] }},kube-controller-1,{{ hostvars['kube-controller-2']['ansible_host'] }},kube-controller-2,{{ hostvars['kube-loadbalancer']['ansible_host'] }},kube-loadbalancer,127.0.0.1,localhost,kubernetes.default"
+
+- name: Generete the rest of the certificates, signed by the CA
+  shell: |
+    cfssl gencert \
+    -ca={{ certs_dir }}/ca.pem \
+    -ca-key={{ certs_dir }}/ca-key.pem \
+    -config={{ csr_dir }}/ca-config.json \
+    -profile={{ profile }} \
+    {{ csr_dir }}/{{ item.name }}-csr.json | cfssljson -bare {{ certs_dir }}/{{ item.name }}
+  loop:
+    - name: kube-controller-manager
+    - name: kube-proxy
+    - name: kube-scheduler
+    - name: service-account

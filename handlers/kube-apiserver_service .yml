@@ -1,17 +1,17 @@
 ---
-- name: Ensure kube-apiserver service is enabled and running
+- name: Ensure kubernetes service is enabled and running
   block:
     - name: Reload systemd daemon
       ansible.builtin.systemd:
         daemon_reload: yes
       changed_when: false
 
-    - name: Enable kube-apiserver service
+    - name: Enable kubernetes service
       ansible.builtin.systemd:
-        name: kube-apiserver
+        name: kubernetes
         enabled: yes
 
-    - name: Start kube-apiserver service
+    - name: Start kubernetes service
       ansible.builtin.systemd:
-        name: kube-apiserver
+        name: kubernetes
         state: started

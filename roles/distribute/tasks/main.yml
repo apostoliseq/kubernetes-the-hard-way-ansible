@@ -1,7 +1,4 @@
 ---
-# Copy files from certs/ to /data/certs /etc/etcd"
-# Copy files from kubeconfigs/ /data/certs /etc/etcd"
-
 - name: Ensure required directories exist
   become: true
   file:
@@ -12,136 +9,41 @@
     - "{{ dest_certs_dir }}"
     - "{{ etcd_dir }}"
 
-- name: Distribute controller certs to /data/certs
+- name: Create reset-env.sh script for cleaning up Kubernetes/etcd files
   become: true
   copy:
-    src: "{{ src_certs_dir }}/{{ item }}"
-    dest: "{{ dest_certs_dir }}/{{ item }}"
-    mode: 0644
-  loop:
-    - ca-key.pem
-    - ca.pem
-    - kube-apiserver-key.pem
-    - kube-apiserver.pem
-    - kube-service-account-key.pem
-    - kube-service-account.pem
-  when: "'controller' in inventory_hostname"
+    dest: "/home/apostoliseq/reset-env.sh"
+    content: |
+      #!/bin/bash
 
-- name: Distribute controller certs to /etc/etcd
-  become: true
-  copy:
-    src: "{{ src_certs_dir }}/{{ item }}"
-    dest: "{{ etcd_dir }}/{{ item }}"
-    mode: 0644
-  loop:
-    - ca-key.pem
-    - ca.pem
-    - kube-apiserver-key.pem
-    - kube-apiserver.pem
-    - kube-service-account-key.pem
-    - kube-service-account.pem
-  when: "'controller' in inventory_hostname"
+      # Brutal Force-Kill
+      for service in etcd kube-apiserver kube-controller-manager kube-scheduler; do \
+        sudo systemctl stop $service.service
+        sudo systemctl disable $service.service
+      done
 
-- name: Distribute worker certs to /data/certs
-  become: true
-  copy:
-    src: "{{ src_certs_dir }}/{{ item }}"
-    dest: "{{ dest_certs_dir }}/{{ item }}"
-    mode: 0644
-  loop:
-    - ca.pem
-  when: "'worker' in inventory_hostname"
+      # Clean Kubernetes and etcd files
+      sudo rm -rf \
+        {{ dest_certs_dir }} \
+        {{ etcd_dir }} \
+        /etc/systemd/system/etcd.service \
+        /etc/systemd/system/kube-* \
+        /var/lib/kubernetes/*
+      
+      # Clean binaries
+      sudo rm -rf /usr/local/bin/*
 
-- name: Distribute worker certs to /etc/etcd
-  become: true
-  copy:
-    src: "{{ src_certs_dir }}/{{ item }}"
-    dest: "{{ etcd_dir }}/{{ item }}"
-    mode: 0644
-  loop:
-    - ca.pem
-  when: "'worker' in inventory_hostname"
+      echo "Environment reset complete"
+    mode: 0755
 
-- name: Distribute loadbalancer certs to /data/certs
-  become: true
-  copy:
-    src: "{{ src_certs_dir }}/{{ item }}"
-    dest: "{{ dest_certs_dir }}/{{ item }}"
-    mode: 0644
-  loop:
-    - ca.pem
-  when: "'loadbalancer' in inventory_hostname"
+- name: Distribute to controller
+  ansible.builtin.include_tasks:
+    file: controller.yml
 
-- name: Distribute loadbalancer certs to /etc/etcd
-  become: true
-  copy:
-    src: "{{ src_certs_dir }}/{{ item }}"
-    dest: "{{ etcd_dir }}/{{ item }}"
-    mode: 0644
-  loop:
-    - ca.pem
-  when: "'loadbalancer' in inventory_hostname"
+- name: Distribute to worker
+  ansible.builtin.include_tasks:
+    file: worker.yml
 
-# Distribute kubeconfigs
-- name: Distribute controller kubeconfig to /data/certs
-  become: true
-  copy:
-    src: "{{ src_kubeconfigs_dir }}/{{ item }}"
-    dest: "{{ dest_certs_dir }}/{{ item }}"
-    mode: 0644
-  loop:
-    - kube-admin.kubeconfig
-    - kube-controller-manager.kubeconfig
-    - kube-scheduler.kubeconfig
-  when: "'controller' in inventory_hostname"
-
-- name: Distribute controller kubeconfig to /etc/etcd
-  become: true
-  copy:
-    src: "{{ src_kubeconfigs_dir }}/{{ item }}"
-    dest: "{{ etcd_dir }}/{{ item }}"
-    mode: 0644
-  loop:
-    - kube-admin.kubeconfig
-    - kube-controller-manager.kubeconfig
-    - kube-scheduler.kubeconfig
-  when: "'controller' in inventory_hostname"
-
-- name: Distribute worker kubeconfig to /data/certs
-  become: true
-  copy:
-    src: "{{ src_kubeconfigs_dir }}/{{ item }}"
-    dest: "{{ dest_certs_dir }}/{{ item }}"
-    mode: 0644
-  loop:
-    - kube-proxy.kubeconfig
-    - "{{ inventory_hostname }}.kubeconfig"
-  when: "'worker' in inventory_hostname"
-
-- name: Distribute worker kubeconfig to /etc/etcd
-  become: true
-  copy:
-    src: "{{ src_kubeconfigs_dir }}/{{ item }}"
-    dest: "{{ etcd_dir }}/{{ item }}"
-    mode: 0644
-  loop:
-    - kube-proxy.kubeconfig
-    - "{{ inventory_hostname }}.kubeconfig"
-  when: "'worker' in inventory_hostname"
-
-# Distribute encryption-config.yaml
-- name: Distribute controller encryption-config.yaml to /data/certs
-  become: true
-  copy:
-    src: "encryption-config.yaml"
-    dest: "{{ dest_certs_dir }}/encryption-config.yaml"
-    mode: 0644
-  when: "'controller' in inventory_hostname"
-
-- name: Distribute controller encryption-config.yaml to /etc/etcd
-  become: true
-  copy:
-    src: "encryption-config.yaml"
-    dest: "{{ etcd_dir }}/encryption-config.yaml"
-    mode: 0644
-  when: "'controller' in inventory_hostname"
+- name: Distribute to loadbalancer
+  ansible.builtin.include_tasks:
+    file: loadbalancer.yml

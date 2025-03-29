@@ -18,10 +18,10 @@
   loop:
     - ca.pem
     - ca-key.pem
-    - kube-apiserver-key.pem
-    - kube-apiserver.pem
-    - kube-service-account-key.pem
-    - kube-service-account.pem
+    - kubernetes-key.pem
+    - kubernetes.pem
+    - service-account-key.pem
+    - service-account.pem
     - encryption-config.yaml
 
 - name: Copy kube-apiserver in /usr/local/bin

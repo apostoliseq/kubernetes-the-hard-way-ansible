@@ -1,10 +1,11 @@
 kind: EncryptionConfig
 apiVersion: v1
-    - resources:
-        - secrets
-    - providers:
-        - aescbc:
-            keys:
-                - name: key1
-                    secret: {{ encryption_key.stdout }}
-        - identity" {}
+resources:
+  - resources:
+      - secrets
+    providers:
+      - aescbc:
+          keys:
+            - name: key1
+              secret: {{ encryption_key.stdout }}
+      - identity: {}

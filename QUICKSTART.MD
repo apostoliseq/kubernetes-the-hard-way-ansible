@@ -52,7 +52,7 @@
 	- **kube-workstation [~]**
  		- `sudo vi /etc/hosts`
 		- `ssh-keygen -f ~/.ssh/ed25519-$USER -t ed25519 -C "kube-components-access" -N ""`
-		- `for ip in $(grep "kube-" /etc/hosts | awk '{print $2}'); do ssh-copy-id -i .ssh/ed25519-$USER.pub $ip; done`
+		- `for ip in $(grep "kube-" /etc/hosts | awk '{print $1}'); do ssh-copy-id -i ~/.ssh/ed25519-$USER.pub $ip; done`
 		- `vi .ssh/config`
 			- [kube-workstation:~/.ssh/config]
 - **kube-workstation to Github**

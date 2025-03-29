@@ -1,0 +1,41 @@
+- name: Distribute worker certs to /data/certs
+  become: true
+  copy:
+    src: "{{ src_certs_dir }}/{{ item }}"
+    dest: "{{ dest_certs_dir }}/{{ item }}"
+    mode: 0644
+  loop:
+    - ca.pem
+  when: "'worker' in inventory_hostname"
+
+- name: Distribute worker certs to /etc/etcd
+  become: true
+  copy:
+    src: "{{ src_certs_dir }}/{{ item }}"
+    dest: "{{ etcd_dir }}/{{ item }}"
+    mode: 0644
+  loop:
+    - ca.pem
+  when: "'worker' in inventory_hostname"
+
+- name: Distribute worker kubeconfig to /data/certs
+  become: true
+  copy:
+    src: "{{ src_kubeconfigs_dir }}/{{ item }}"
+    dest: "{{ dest_certs_dir }}/{{ item }}"
+    mode: 0644
+  loop:
+    - kube-proxy.kubeconfig
+    - "{{ inventory_hostname }}.kubeconfig"
+  when: "'worker' in inventory_hostname"
+
+- name: Distribute worker kubeconfig to /etc/etcd
+  become: true
+  copy:
+    src: "{{ src_kubeconfigs_dir }}/{{ item }}"
+    dest: "{{ etcd_dir }}/{{ item }}"
+    mode: 0644
+  loop:
+    - kube-proxy.kubeconfig
+    - "{{ inventory_hostname }}.kubeconfig"
+  when: "'worker' in inventory_hostname"

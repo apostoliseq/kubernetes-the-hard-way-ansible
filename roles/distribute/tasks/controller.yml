@@ -1,0 +1,69 @@
+- name: Distribute controller certs to /data/certs
+  become: true
+  copy:
+    src: "{{ src_certs_dir }}/{{ item }}"
+    dest: "{{ dest_certs_dir }}/{{ item }}"
+    mode: 0644
+  loop:
+    - ca-key.pem
+    - ca.pem
+    - kubernetes-key.pem
+    - kubernetes.pem
+    - service-account-key.pem
+    - service-account.pem
+  when: "'controller' in inventory_hostname"
+
+- name: Distribute controller certs to /etc/etcd
+  become: true
+  copy:
+    src: "{{ src_certs_dir }}/{{ item }}"
+    dest: "{{ etcd_dir }}/{{ item }}"
+    mode: 0644
+  loop:
+    - ca-key.pem
+    - ca.pem
+    - kubernetes-key.pem
+    - kubernetes.pem
+    - service-account-key.pem
+    - service-account.pem
+  when: "'controller' in inventory_hostname"
+
+- name: Distribute controller kubeconfig to /data/certs
+  become: true
+  copy:
+    src: "{{ src_kubeconfigs_dir }}/{{ item }}"
+    dest: "{{ dest_certs_dir }}/{{ item }}"
+    mode: 0644
+  loop:
+    - admin.kubeconfig
+    - kube-controller-manager.kubeconfig
+    - kube-scheduler.kubeconfig
+  when: "'controller' in inventory_hostname"
+
+- name: Distribute controller kubeconfig to /etc/etcd
+  become: true
+  copy:
+    src: "{{ src_kubeconfigs_dir }}/{{ item }}"
+    dest: "{{ etcd_dir }}/{{ item }}"
+    mode: 0644
+  loop:
+    - admin.kubeconfig
+    - kube-controller-manager.kubeconfig
+    - kube-scheduler.kubeconfig
+  when: "'controller' in inventory_hostname"
+
+- name: Distribute controller encryption-config.yaml to /data/certs
+  become: true
+  copy:
+    src: "encryption-config.yaml"
+    dest: "{{ dest_certs_dir }}/encryption-config.yaml"
+    mode: 0644
+  when: "'controller' in inventory_hostname"
+
+- name: Distribute controller encryption-config.yaml to /etc/etcd
+  become: true
+  copy:
+    src: "encryption-config.yaml"
+    dest: "{{ etcd_dir }}/encryption-config.yaml"
+    mode: 0644
+  when: "'controller' in inventory_hostname"

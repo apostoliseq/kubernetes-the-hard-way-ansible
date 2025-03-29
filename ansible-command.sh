@@ -1,4 +1,5 @@
 #!/bin/bash
+
 ansible-playbook playbook.yaml --ask-become-pass
 
 # if [ -z "$1" ]; then
