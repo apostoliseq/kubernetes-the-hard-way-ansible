@@ -1,14 +1,12 @@
 - name: Create ca-config.json
   ansible.builtin.template:
     src: ca-config.j2
-    dest: "{{ ca_config }}"
+    dest: "{{ certs_dir }}/ca-config.json"
     mode: '0644'
 
 - name: Create -csr.json files
   ansible.builtin.template:
     src: "csr.j2"
-    dest: "{{ csrs_dir }}/{{ component }}-csr.json"
+    dest: "{{ csrs_dir }}/{{ item }}-csr.json"
     mode: '0644'
-  vars:
-    component: "{{ item }}"
   loop: "{{ kube_components.keys() | list }}"

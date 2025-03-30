@@ -9,6 +9,7 @@ ExecStart=/usr/local/bin/etcd \
 --key-file=/etc/etcd/kubernetes-key.pem \
 --peer-cert-file=/etc/etcd/kubernetes.pem \
 --peer-key-file=/etc/etcd/kubernetes-key.pem \
+--trusted-ca-file=/etc/etcd/ca.pem \
 --peer-trusted-ca-file=/etc/etcd/ca.pem \
 --peer-client-cert-auth \
 --client-cert-auth \
@@ -17,7 +18,7 @@ ExecStart=/usr/local/bin/etcd \
 --listen-client-urls https://{{ ansible_default_ipv4.address }}:2379,https://127.0.0.1:2379 \
 --advertise-client-urls https://{{ ansible_default_ipv4.address }}:2379 \
 --initial-cluster-token etcd-cluster-0 \
---initial-cluster=kube-controller-1 https://{{ hostvars['kube-controller-1']['ansible_host'] }}:2380,kube-controller-2=https://{{ hostvars['kube-controller-2']['ansible_host'] }}:2380 \
+--initial-cluster kube-controller-1=https://{{ hostvars['kube-controller-1']['ansible_host'] }}:2380,kube-controller-2=https://{{ hostvars['kube-controller-2']['ansible_host'] }}:2380 \
 --initial-cluster-state new \
 --data-dir=/var/lib/etcd 
 Restart=on-failure

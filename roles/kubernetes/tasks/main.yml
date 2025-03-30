@@ -27,7 +27,7 @@
 - name: Copy kube-apiserver in /usr/local/bin
   become: true
   copy:
-      src: ./downloads/kube-apiserver 
+      src: "{{ downloads_dir }}/kube-apiserver"
       dest: /usr/local/bin
       owner: root
       group: root
@@ -38,4 +38,5 @@
   ansible.builtin.template:
     src: "kube-apiserver.j2"
     dest: /etc/systemd/system/kube-apiserver.service
+    force: yes
     mode: '0644'

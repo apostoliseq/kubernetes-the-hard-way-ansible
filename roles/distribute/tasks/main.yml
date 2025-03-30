@@ -6,13 +6,13 @@
     state: directory
     mode: '0755'
   loop:
-    - "{{ dest_certs_dir }}"
+    - "{{ certs_dir }}"
     - "{{ etcd_dir }}"
 
 - name: Create reset-env.sh script for cleaning up Kubernetes/etcd files
   become: true
   copy:
-    dest: "/home/apostoliseq/reset-env.sh"
+    dest: reset-env.sh
     content: |
       #!/bin/bash
 
@@ -24,7 +24,7 @@
 
       # Clean Kubernetes and etcd files
       sudo rm -rf \
-        {{ dest_certs_dir }} \
+        {{ certs_dir }} \
         {{ etcd_dir }} \
         /etc/systemd/system/etcd.service \
         /etc/systemd/system/kube-* \

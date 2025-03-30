@@ -1,5 +1,5 @@
 {
-    "CN": "{{ kube_components[component].cn }}",
+    "CN": "{{ kube_components[ item ].cn }}",
     "key": {
         "algo": "rsa",
         "size": 2048
@@ -9,8 +9,8 @@
         {
             "C": "Greece",
             "L": "Evoia",
-            "O": "{{ kube_components[component].o }}",
-            "OU": "{{ kube_components[component].ou }}",
+            "O": "{{ kube_components[ item ].o }}",
+            "OU": "{{ kube_components[ item ].ou }}",
             "ST": "Chalcis"
         }
     ]

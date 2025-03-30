@@ -1,6 +1,1 @@
-certs/
-csrs/
-downloads
-kubeconfigs/
-encryption-config.yaml
-etcd-v3.3.5-linux-amd64.tar.gz
+data/

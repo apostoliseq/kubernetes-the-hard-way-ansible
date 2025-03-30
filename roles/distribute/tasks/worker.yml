@@ -1,37 +1,25 @@
-- name: Distribute worker certs to /data/certs
+- name: Distribute worker certs
   become: true
   copy:
-    src: "{{ src_certs_dir }}/{{ item }}"
-    dest: "{{ dest_certs_dir }}/{{ item }}"
+    src: "{{ certs_dir }}/{{ item.file }}"
+    dest: "{{ item.dest }}/{{ item.file }}"
     mode: 0644
   loop:
-    - ca.pem
+    - { file: "ca.pem", dest: "{{ certs_dir }}" }
+    - { file: "{{ inventory_hostname }}-key.pem", dest: "{{ certs_dir }}" }
+    - { file: "{{ inventory_hostname }}.pem", dest: "{{ certs_dir }}" }
+    - { file: "ca.pem", dest: "{{ etcd_dir }}" }
+    - { file: "{{ inventory_hostname }}-key.pem", dest: "{{ etcd_dir }}" }
+    - { file: "{{ inventory_hostname }}.pem", dest: "{{ etcd_dir }}" }
 
-- name: Distribute worker certs to /etc/etcd
+- name: Distribute worker kubeconfigs
   become: true
   copy:
-    src: "{{ src_certs_dir }}/{{ item }}"
-    dest: "{{ etcd_dir }}/{{ item }}"
+    src: "{{ certs_dir }}/{{ item.file }}"
+    dest: "{{ item.dest }}/{{ item.file }}"
     mode: 0644
   loop:
-    - ca.pem
-
-- name: Distribute worker kubeconfig to /data/certs
-  become: true
-  copy:
-    src: "{{ src_kubeconfigs_dir }}/{{ item }}"
-    dest: "{{ dest_certs_dir }}/{{ item }}"
-    mode: 0644
-  loop:
-    - kube-proxy.kubeconfig
-    - "{{ inventory_hostname }}.kubeconfig"
-
-- name: Distribute worker kubeconfig to /etc/etcd
-  become: true
-  copy:
-    src: "{{ src_kubeconfigs_dir }}/{{ item }}"
-    dest: "{{ etcd_dir }}/{{ item }}"
-    mode: 0644
-  loop:
-    - kube-proxy.kubeconfig
-    - "{{ inventory_hostname }}.kubeconfig"
+    - { file: "{{ inventory_hostname }}.kubeconfig", dest: "{{ certs_dir }}" }
+    - { file: "{{ inventory_hostname }}.kubeconfig", dest: "{{ etcd_dir }}" }
+    - { file: "kube-proxy.kubeconfig", dest: "{{ certs_dir }}" }
+    - { file: "kube-proxy.kubeconfig", dest: "{{ etcd_dir }}" }

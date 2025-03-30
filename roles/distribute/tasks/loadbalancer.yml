@@ -1,9 +1,9 @@
 - name: Distribute loadbalancer ca.pem
   become: true
   copy:
-    src: "{{ src_certs_dir }}/ca.pem"
+    src: "{{ certs_dir }}/ca.pem"
     dest: "{{ item }}/ca.pem"
     mode: 0644
   loop:
-    - "{{ dest_certs_dir }}"
+    - "{{ certs_dir }}"
     - "{{ etcd_dir }}"

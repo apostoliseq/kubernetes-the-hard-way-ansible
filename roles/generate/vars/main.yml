@@ -1,8 +1,6 @@
 ---
-certs_dir: ./certs
-csrs_dir: ./csrs
-kubeconfig_dir: ./kubeconfigs
-generate_scripts_dir: ./generate_scripts
+certs_dir: data/certs
+csrs_dir: data/csrs
 
 cluster_name: "kubernetes-the-hard-way"
 profile: "kubernetes"
@@ -53,7 +51,3 @@ kube_components:
     o: "Kubernetes"
     ou: "Kubernetes The Hard Way"
     server: "127.0.0.1"
-
-ca_pem: "{{ certs_dir }}/ca.pem"
-ca_key_pem: "{{ certs_dir }}/ca-key.pem"
-ca_config: "{{ csrs_dir }}/ca-config.json"

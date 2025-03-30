@@ -1,5 +1,6 @@
 ---
+downloads_dir: data/downloads
 etc_etcd_dir: /etc/etcd
 var_lib_etcd_dir: /var/lib/etcd
-initial_cluster_state: "{{ 'new' if 'kube-controller-1' in inventory_hostname else 'existing' }}"
+# initial_cluster_state: "{{ 'new' if 'kube-controller-1' in inventory_hostname else 'existing' }}"
 # etcd_token: "{{ 0 if 'kube-controller-1' in inventory_hostname else 1 }}"

@@ -19,7 +19,7 @@
 - name: Copy kube-controller-manager in /usr/local/bin
   become: true
   copy:
-      src: ./downloads/kube-controller-manager 
+      src: "{{ downloads_dir }}/kube-controller-manager"
       dest: /usr/local/bin
       owner: root
       group: root
@@ -30,5 +30,5 @@
   ansible.builtin.template:
     src: "kube-controller-manager.j2"
     dest: /etc/systemd/system/kube-controller-manager.service
+    force: yes
     mode: '0644'
-  when: "'controller' in inventory_hostname"

@@ -30,7 +30,7 @@
 - name: Copy kube-scheduler in /usr/local/bin
   become: true
   copy:
-      src: ./downloads/kube-scheduler 
+      src: "{{ downloads_dir }}/kube-scheduler"
       dest: /usr/local/bin
       owner: root
       group: root
@@ -41,5 +41,5 @@
   ansible.builtin.template:
     src: "kube-controller.j2"
     dest: /etc/systemd/system/kube-scheduler.service
+    force: yes
     mode: '0644'
-  when: "'controller' in inventory_hostname"

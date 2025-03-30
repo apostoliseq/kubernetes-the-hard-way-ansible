@@ -6,9 +6,9 @@
 - name: Generete certificates that use -hostname, signed by the CA
   shell: |
     cfssl gencert \
-    -ca={{ ca_pem }} \
-    -ca-key={{ ca_key_pem }} \
-    -config={{ ca_config }} \
+    -ca={{ certs_dir }}/ca.pem \
+    -ca-key={{ certs_dir }}/ca-key.pem \
+    -config={{ certs_dir }}/ca-config.json \
     -hostname={{ item.hostnames }} \
     -profile={{ profile }} \
     {{ csrs_dir }}/{{ item.name }}-csr.json | cfssljson -bare {{ certs_dir }}/{{ item.name }}
@@ -23,9 +23,9 @@
 - name: Generete the rest of the certificates, signed by the CA
   shell: |
     cfssl gencert \
-    -ca={{ ca_pem }} \
-    -ca-key={{ ca_key_pem }} \
-    -config={{ ca_config }} \
+    -ca={{ certs_dir }}/ca.pem \
+    -ca-key={{ certs_dir }}/ca-key.pem \
+    -config={{ certs_dir }}/ca-config.json \
     -profile={{ profile }} \
     {{ csrs_dir }}/{{ item }}-csr.json | cfssljson -bare {{ certs_dir }}/{{ item }}
   loop:

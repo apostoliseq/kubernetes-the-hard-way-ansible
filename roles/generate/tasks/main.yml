@@ -7,7 +7,6 @@
   loop:
     - "{{ csrs_dir }}"
     - "{{ certs_dir }}"
-    - "{{ kubeconfig_dir }}"
 
 - name: Generate ca-config.json and csrs
   ansible.builtin.include_tasks:
