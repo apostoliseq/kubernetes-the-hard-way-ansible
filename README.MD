@@ -1,41 +1,16 @@
-### SSH Overview & Setup
-
-# Installs
-- Nodes: OpenSSH server
-- Workstation: OpenSSH client
-
-# Flow
-- Connect to each node from the workstation and answer "yes" to the initial connection prompt ( to find automatic way )
-- Create an SSH key pair for your normal user accoumt ( with passphrase )
-```
-ssh-keygen -t ed25519 -C "apostoliseq default"
-```
-- Add the key to authorized_files' of each node
-```
-ssh-copy-id.sh
-```
-- Create an SSH key that its specific to Ansible ( no passphrase ) ~/.ssh/ansible
-```
-ssh-keygen -t ed25519 -C "ansible"
-```
-- Add the key to authorized_files' of each node
-```
-ssh-copy-id.sh
-```
-
 # Ansible
 
 # Install
 ```
 sudo apt update -y
-sudo apt install ansible
+sudo apt install -y ansible
 ```
-- Create inventory file with the nodes to be managed (inventory.ini)
+- Create inventory.ini with the nodes to be managed
 - Troubleshoot #1
 ```
 ansible all --key-file ~/.ssh/ansible -i inventory.ini -m ping
 ```
-- Create ansible config (ansible.cfg)
+- Create ansible.cfg
 ```
 ansible all --key-file -m ping
 ```
@@ -84,3 +59,11 @@ ansible all -m apt -a update_cache=true --become --ask-become-pass
     - **Purpose**: Contains variables specific to the role.
     - **Use Case**: Variables defined here are not meant to be overridden by users (unlike defaults/).
     - **Example**: vars/main.yml might define internal variables used by the role.
+
+# Check etcd status with
+sudo ETCDCTL_API=3 etcdctl \
+  --endpoints=https://127.0.0.1:2379 \
+  --cacert=/etc/etcd/ca.pem \
+  --cert=/etc/etcd/kubernetes.pem \
+  --key=/etc/etcd/kubernetes-key.pem \
+  endpoint health
