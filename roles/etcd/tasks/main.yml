@@ -27,22 +27,3 @@
     force: yes
     mode: '0644'
   when: "'controller' in inventory_hostname"
-  # notify: Ensure etcd service is enabled and running
-
-- name: Ensure etcd service is enabled and running
-  become: true
-  block:
-    - name: Reload systemd daemon
-      ansible.builtin.systemd:
-        daemon_reload: yes
-      changed_when: false
-
-    - name: Enable etcd service
-      ansible.builtin.systemd:
-        name: etcd
-        enabled: yes
-
-    - name: Start etcd service
-      ansible.builtin.systemd:
-        name: etcd
-        state: started

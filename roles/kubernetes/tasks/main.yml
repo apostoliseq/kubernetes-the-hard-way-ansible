@@ -39,22 +39,3 @@
     src: "kube-apiserver.j2"
     dest: /etc/systemd/system/kube-apiserver.service
     mode: '0644'
-  when: "'controller' in inventory_hostname"
-
-- name: Ensure kube-apiserver service is enabled and running
-  become: true
-  block:
-    - name: Reload systemd daemon
-      ansible.builtin.systemd:
-        daemon_reload: yes
-      changed_when: false
-
-    - name: Enable kube-apiserver service
-      ansible.builtin.systemd:
-        name: kube-apiserver
-        enabled: yes
-
-    - name: Start kube-apiserver service
-      ansible.builtin.systemd:
-        name: kube-apiserver
-        state: started

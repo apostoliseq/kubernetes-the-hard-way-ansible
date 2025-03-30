@@ -1,19 +1,9 @@
-- name: Distribute loadbalancer certs to /data/certs
+- name: Distribute loadbalancer ca.pem
   become: true
   copy:
-    src: "{{ src_certs_dir }}/{{ item }}"
-    dest: "{{ dest_certs_dir }}/{{ item }}"
+    src: "{{ src_certs_dir }}/ca.pem"
+    dest: "{{ item }}/ca.pem"
     mode: 0644
   loop:
-    - ca.pem
-  when: "'loadbalancer' in inventory_hostname"
-
-- name: Distribute loadbalancer certs to /etc/etcd
-  become: true
-  copy:
-    src: "{{ src_certs_dir }}/{{ item }}"
-    dest: "{{ etcd_dir }}/{{ item }}"
-    mode: 0644
-  loop:
-    - ca.pem
-  when: "'loadbalancer' in inventory_hostname"
+    - "{{ dest_certs_dir }}"
+    - "{{ etcd_dir }}"

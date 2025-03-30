@@ -43,21 +43,3 @@
     dest: /etc/systemd/system/kube-scheduler.service
     mode: '0644'
   when: "'controller' in inventory_hostname"
-
-- name: Ensure kube-scheduler service is enabled and running
-  become: true
-  block:
-    - name: Reload systemd daemon
-      ansible.builtin.systemd:
-        daemon_reload: yes
-      changed_when: false
-
-    - name: Enable kube-scheduler service
-      ansible.builtin.systemd:
-        name: kube-scheduler
-        enabled: yes
-
-    - name: Start kube-scheduler service
-      ansible.builtin.systemd:
-        name: kube-scheduler
-        state: started

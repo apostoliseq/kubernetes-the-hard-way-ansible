@@ -6,7 +6,6 @@
     mode: 0644
   loop:
     - ca.pem
-  when: "'worker' in inventory_hostname"
 
 - name: Distribute worker certs to /etc/etcd
   become: true
@@ -16,7 +15,6 @@
     mode: 0644
   loop:
     - ca.pem
-  when: "'worker' in inventory_hostname"
 
 - name: Distribute worker kubeconfig to /data/certs
   become: true
@@ -27,7 +25,6 @@
   loop:
     - kube-proxy.kubeconfig
     - "{{ inventory_hostname }}.kubeconfig"
-  when: "'worker' in inventory_hostname"
 
 - name: Distribute worker kubeconfig to /etc/etcd
   become: true
@@ -38,4 +35,3 @@
   loop:
     - kube-proxy.kubeconfig
     - "{{ inventory_hostname }}.kubeconfig"
-  when: "'worker' in inventory_hostname"

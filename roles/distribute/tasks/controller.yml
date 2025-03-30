@@ -1,69 +1,43 @@
-- name: Distribute controller certs to /data/certs
+- name: Distribute controller certs
   become: true
   copy:
-    src: "{{ src_certs_dir }}/{{ item }}"
-    dest: "{{ dest_certs_dir }}/{{ item }}"
+    src: "{{ src_certs_dir }}/{{ item.file }}"
+    dest: "{{ item.dest }}/{{ item.file }}"
     mode: 0644
   loop:
-    - ca-key.pem
-    - ca.pem
-    - kubernetes-key.pem
-    - kubernetes.pem
-    - service-account-key.pem
-    - service-account.pem
-  when: "'controller' in inventory_hostname"
+    - { file: "ca-key.pem", dest: "{{ dest_certs_dir }}" }
+    - { file: "ca.pem", dest: "{{ dest_certs_dir }}" }
+    - { file: "kubernetes-key.pem", dest: "{{ dest_certs_dir }}" }
+    - { file: "kubernetes.pem", dest: "{{ dest_certs_dir }}" }
+    - { file: "service-account-key.pem", dest: "{{ dest_certs_dir }}" }
+    - { file: "service-account.pem", dest: "{{ dest_certs_dir }}" }
+    - { file: "ca-key.pem", dest: "{{ etcd_dir }}" }
+    - { file: "ca.pem", dest: "{{ etcd_dir }}" }
+    - { file: "kubernetes-key.pem", dest: "{{ etcd_dir }}" }
+    - { file: "kubernetes.pem", dest: "{{ etcd_dir }}" }
+    - { file: "service-account-key.pem", dest: "{{ etcd_dir }}" }
+    - { file: "service-account.pem", dest: "{{ etcd_dir }}" }
 
-- name: Distribute controller certs to /etc/etcd
+- name: Distribute controller kubeconfigs
   become: true
   copy:
-    src: "{{ src_certs_dir }}/{{ item }}"
-    dest: "{{ etcd_dir }}/{{ item }}"
+    src: "{{ src_kubeconfigs_dir }}/{{ item.file }}"
+    dest: "{{ item.dest }}/{{ item.file }}"
     mode: 0644
   loop:
-    - ca-key.pem
-    - ca.pem
-    - kubernetes-key.pem
-    - kubernetes.pem
-    - service-account-key.pem
-    - service-account.pem
-  when: "'controller' in inventory_hostname"
+    - { file: "admin.kubeconfig", dest: "{{ dest_certs_dir }}" }
+    - { file: "kube-controller-manager.kubeconfig", dest: "{{ dest_certs_dir }}" }
+    - { file: "kube-scheduler.kubeconfig", dest: "{{ dest_certs_dir }}" }
+    - { file: "admin.kubeconfig", dest: "{{ etcd_dir }}" }
+    - { file: "kube-controller-manager.kubeconfig", dest: "{{ etcd_dir }}" }
+    - { file: "kube-scheduler.kubeconfig", dest: "{{ etcd_dir }}" }
 
-- name: Distribute controller kubeconfig to /data/certs
-  become: true
-  copy:
-    src: "{{ src_kubeconfigs_dir }}/{{ item }}"
-    dest: "{{ dest_certs_dir }}/{{ item }}"
-    mode: 0644
-  loop:
-    - admin.kubeconfig
-    - kube-controller-manager.kubeconfig
-    - kube-scheduler.kubeconfig
-  when: "'controller' in inventory_hostname"
-
-- name: Distribute controller kubeconfig to /etc/etcd
-  become: true
-  copy:
-    src: "{{ src_kubeconfigs_dir }}/{{ item }}"
-    dest: "{{ etcd_dir }}/{{ item }}"
-    mode: 0644
-  loop:
-    - admin.kubeconfig
-    - kube-controller-manager.kubeconfig
-    - kube-scheduler.kubeconfig
-  when: "'controller' in inventory_hostname"
-
-- name: Distribute controller encryption-config.yaml to /data/certs
+- name: Distribute controller encryption-config.yaml
   become: true
   copy:
     src: "encryption-config.yaml"
-    dest: "{{ dest_certs_dir }}/encryption-config.yaml"
+    dest: "{{ item }}/encryption-config.yaml"
     mode: 0644
-  when: "'controller' in inventory_hostname"
-
-- name: Distribute controller encryption-config.yaml to /etc/etcd
-  become: true
-  copy:
-    src: "encryption-config.yaml"
-    dest: "{{ etcd_dir }}/encryption-config.yaml"
-    mode: 0644
-  when: "'controller' in inventory_hostname"
+  loop:
+    - "{{ dest_certs_dir }}"
+    - "{{ etcd_dir }}"

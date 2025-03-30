@@ -1,20 +1,20 @@
 ---
-- name: Ensure downloads/ exists
+- name: Ensure "{{ downloads_dir }}" exists
   file:
-    path: ./downloads
+    path: "{{ downloads_dir }}"
     state: directory
     mode: '0755'
 
 - name: Ensure etcd binary
   get_url:
     url: https://github.com/coreos/etcd/releases/download/v3.3.5/etcd-v{{ etcd_version }}-linux-amd64.tar.gz
-    dest: downloads/etcd-v3.3.5-linux-amd64.tar.gz
+    dest: "{{ downloads_dir }}/etcd-v3.3.5-linux-amd64.tar.gz"
     mode: '0755'
 
 - name: Download kubernetes binaries
   get_url:
     url: "https://storage.googleapis.com/kubernetes-release/release/v{{ component_version }}/bin/linux/amd64/{{ item }}"
-    dest: "downloads/{{ item }}"
+    dest: "{{ downloads_dir }}/{{ item }}"
     mode: '0755'
   loop:
     - kube-apiserver

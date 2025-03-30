@@ -14,7 +14,7 @@
   roles:
     - distribute
 
-- name: Install kube-controllers
+- name: Install kube-components
   hosts: controllers
   pre_tasks:
     - name: Ensure directories
@@ -29,3 +29,32 @@
     - kubernetes
     - kube-controller-manager
     - kube-scheduler
+
+  post_tasks:
+    - name: Ensure service is enabled and running
+      become: true
+      block:
+        - name: Reload systemd daemon
+          ansible.builtin.systemd:
+            daemon_reload: yes
+          changed_when: false
+
+        - name: Enable service
+          ansible.builtin.systemd:
+            name: "{{ item }}"
+            enabled: yes
+          loop:
+            - etcd
+            - kube-apiserver
+            - kube-controller-manager
+            - kube-scheduler
+
+        - name: Start service
+          ansible.builtin.systemd:
+            name: "{{ item }}"
+            state: started
+          loop:
+            - etcd
+            - kube-apiserver
+            - kube-controller-manager
+            - kube-scheduler

@@ -5,11 +5,11 @@
     state: directory
     mode: '0755'
   loop:
-    - "{{ csr_dir }}"
+    - "{{ csrs_dir }}"
     - "{{ certs_dir }}"
     - "{{ kubeconfig_dir }}"
 
-- name: Create ca-config.json and -csr.json files in csr/
+- name: Generate ca-config.json and csrs
   ansible.builtin.include_tasks:
     file: csrs.yml
 
@@ -17,7 +17,7 @@
   ansible.builtin.include_tasks:
     file: certs.yml
 
-- name: Generate the kube-component kubeconfig
+- name: Generate the kube-component kubeconfigs
   ansible.builtin.include_tasks:
     file: kubeconfigs.yml
 

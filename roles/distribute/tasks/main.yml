@@ -39,11 +39,14 @@
 - name: Distribute to controller
   ansible.builtin.include_tasks:
     file: controller.yml
+  when: "'controller' in inventory_hostname"
 
 - name: Distribute to worker
   ansible.builtin.include_tasks:
     file: worker.yml
+  when: "'worker' in inventory_hostname"
 
 - name: Distribute to loadbalancer
   ansible.builtin.include_tasks:
     file: loadbalancer.yml
+  when: "'loadbalancer' in inventory_hostname"

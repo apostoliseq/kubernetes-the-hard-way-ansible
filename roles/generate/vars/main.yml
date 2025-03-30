@@ -1,6 +1,6 @@
 ---
 certs_dir: ./certs
-csr_dir: ./csr
+csrs_dir: ./csrs
 kubeconfig_dir: ./kubeconfigs
 generate_scripts_dir: ./generate_scripts
 
@@ -12,35 +12,48 @@ kube_components:
     cn: "Kubernetes"
     o: "Kubernetes"
     ou: "CA"
+    server: "127.0.0.1"
   admin:
     cn: "admin"
     o: "system:masters"
     ou: "Kubernetes The Hard Way"
+    server: "127.0.0.1"
   kube-worker-1:
     cn: "system:node:kube-worker-1"
     o: "system:nodes"
     ou: "Kubernetes The Hard Way"
+    server: "{{ hostvars['kube-loadbalancer']['ansible_host'] }}"
   kube-worker-2:
     cn: "system:node:kube-worker-2"
     o: "system:nodes"
     ou: "Kubernetes The Hard Way"
+    server: "{{ hostvars['kube-loadbalancer']['ansible_host'] }}"
   kube-controller-manager:
     cn: "system:kube-controller-manager"
     o: "system:kube-controller-manager"
     ou: "Kubernetes The Hard Way"
+    server: "127.0.0.1"
   kube-scheduler:
     cn: "system:kube-scheduler"
     o: "system:kube-scheduler"
     ou: "Kubernetes The Hard Way"
+    server: "127.0.0.1"
   kube-proxy:
     cn: "system:kube-proxy"
     o: "system:node-proxier"
     ou: "Kubernetes The Hard Way"
+    server: "{{ hostvars['kube-loadbalancer']['ansible_host'] }}"
   kubernetes:
     cn: "kubernetes"
     o: "Kubernetes"
     ou: "Kubernetes The Hard Way"
+    server: "127.0.0.1"
   service-account:
     cn: "service-accounts"
     o: "Kubernetes"
     ou: "Kubernetes The Hard Way"
+    server: "127.0.0.1"
+
+ca_pem: "{{ certs_dir }}/ca.pem"
+ca_key_pem: "{{ certs_dir }}/ca-key.pem"
+ca_config: "{{ csrs_dir }}/ca-config.json"

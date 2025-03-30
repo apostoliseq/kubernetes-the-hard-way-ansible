@@ -1,5 +1,5 @@
 certs/
-csr/
+csrs/
 downloads
 kubeconfigs/
 encryption-config.yaml

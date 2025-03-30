@@ -1,26 +1,17 @@
 - name: Generete a self-signed CA certificate using the CSR defined in ca-csr.json
   shell: |
-    cfssl gencert -initca {{ csr_dir }}/ca-csr.json | cfssljson -bare {{ certs_dir }}/ca
+    cfssl gencert -initca {{ csrs_dir }}/ca-csr.json | cfssljson -bare {{ certs_dir }}/ca
   register: "output"
-
-- name: Generete the admin certificate, signed by the CA
-  shell: |
-    cfssl gencert \
-    -ca={{ certs_dir }}/ca.pem \
-    -ca-key={{ certs_dir }}/ca-key.pem \
-    -config={{ csr_dir }}/ca-config.json \
-    -profile={{ profile }} \
-    {{ csr_dir }}/admin-csr.json | cfssljson -bare {{ certs_dir }}/admin
 
 - name: Generete certificates that use -hostname, signed by the CA
   shell: |
     cfssl gencert \
-    -ca={{ certs_dir }}/ca.pem \
-    -ca-key={{ certs_dir }}/ca-key.pem \
-    -config={{ csr_dir }}/ca-config.json \
+    -ca={{ ca_pem }} \
+    -ca-key={{ ca_key_pem }} \
+    -config={{ ca_config }} \
     -hostname={{ item.hostnames }} \
     -profile={{ profile }} \
-    {{ csr_dir }}/{{ item.name }}-csr.json | cfssljson -bare {{ certs_dir }}/{{ item.name }}
+    {{ csrs_dir }}/{{ item.name }}-csr.json | cfssljson -bare {{ certs_dir }}/{{ item.name }}
   loop:
     - name: "kube-worker-1"
       hostnames: "{{ hostvars['kube-worker-1']['ansible_host'] }},kube-worker-1"
@@ -32,13 +23,14 @@
 - name: Generete the rest of the certificates, signed by the CA
   shell: |
     cfssl gencert \
-    -ca={{ certs_dir }}/ca.pem \
-    -ca-key={{ certs_dir }}/ca-key.pem \
-    -config={{ csr_dir }}/ca-config.json \
+    -ca={{ ca_pem }} \
+    -ca-key={{ ca_key_pem }} \
+    -config={{ ca_config }} \
     -profile={{ profile }} \
-    {{ csr_dir }}/{{ item.name }}-csr.json | cfssljson -bare {{ certs_dir }}/{{ item.name }}
+    {{ csrs_dir }}/{{ item }}-csr.json | cfssljson -bare {{ certs_dir }}/{{ item }}
   loop:
-    - name: kube-controller-manager
-    - name: kube-proxy
-    - name: kube-scheduler
-    - name: service-account
+    - admin
+    - kube-controller-manager
+    - kube-proxy
+    - kube-scheduler
+    - service-account
