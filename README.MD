@@ -67,3 +67,9 @@ sudo ETCDCTL_API=3 etcdctl \
   --cert=/etc/etcd/kubernetes.pem \
   --key=/etc/etcd/kubernetes-key.pem \
   endpoint health
+
+# Check services
+kubectl get componentstatuses --kubeconfig admin.kubeconfig
+
+# Check kube-apiserver healthcheck endpoint via http
+`curl -H "Host: kubernetes.default.svc.cluster.local" -i http://127.0.0.1/healthz`

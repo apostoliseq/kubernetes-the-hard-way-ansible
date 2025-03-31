@@ -23,12 +23,22 @@
         path: /etc/kubernetes/config
         state: directory
         mode: '0755'
+    
+    - name: Copy kubectl in /usr/local/bin
+      become: true
+      copy:
+          src: "{{ downloads_dir }}/kubectl"
+          dest: /usr/local/bin
+          owner: root
+          group: root
+          mode: '0755'
   
   roles:
     - etcd
     - kubernetes
     - kube-controller-manager
     - kube-scheduler
+    - nginx
 
   post_tasks:
     - name: Ensure service is enabled and running
@@ -48,6 +58,7 @@
             - kube-apiserver
             - kube-controller-manager
             - kube-scheduler
+            - nginx
 
         - name: Start service
           ansible.builtin.systemd:
@@ -58,3 +69,4 @@
             - kube-apiserver
             - kube-controller-manager
             - kube-scheduler
+            - nginx
