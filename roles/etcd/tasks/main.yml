@@ -9,10 +9,10 @@
     - "{{ etc_etcd_dir }}"
     - "{{ var_lib_etcd_dir }}"
 
-- name: Untar etcd-v3.3.5-linux-amd64.tar.gz in /usr/local/bin
+- name: Untar etcd-v{{ etcd_version }}-linux-amd64.tar.gz in /usr/local/bin
   become: true
   unarchive:
-      src: "{{ downloads_dir }}/etcd-v3.3.5-linux-amd64.tar.gz"
+      src: "{{ downloads_dir }}/etcd-v{{ etcd_version }}-linux-amd64.tar.gz"
       dest: /usr/local/bin
       extra_opts: [--strip-components=1]
       owner: root

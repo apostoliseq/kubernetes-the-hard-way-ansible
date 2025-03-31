@@ -60,7 +60,14 @@ ansible all -m apt -a update_cache=true --become --ask-become-pass
     - **Use Case**: Variables defined here are not meant to be overridden by users (unlike defaults/).
     - **Example**: vars/main.yml might define internal variables used by the role.
 
-# Check etcd status with
+# Check etcd member list
+sudo ETCDCTL_API=3 etcdctl member list \
+  --endpoints=https://127.0.0.1:2379 \
+  --cacert=/etc/etcd/ca.pem \
+  --cert=/etc/etcd/kubernetes.pem \
+  --key=/etc/etcd/kubernetes-key.pem
+
+# Check etcd status
 sudo ETCDCTL_API=3 etcdctl \
   --endpoints=https://127.0.0.1:2379 \
   --cacert=/etc/etcd/ca.pem \
@@ -68,8 +75,8 @@ sudo ETCDCTL_API=3 etcdctl \
   --key=/etc/etcd/kubernetes-key.pem \
   endpoint health
 
-# Check services
-kubectl get componentstatuses --kubeconfig admin.kubeconfig
+# Check kube components status
+kubectl get componentstatuses --kubeconfig data/certs/admin.kubeconfig
 
 # Check kube-apiserver healthcheck endpoint via http
-`curl -H "Host: kubernetes.default.svc.cluster.local" -i http://127.0.0.1/healthz`
+curl -H "Host: kubernetes.default.svc.cluster.local" -i http://127.0.0.1/healthz

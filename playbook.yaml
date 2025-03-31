@@ -70,3 +70,8 @@
             - kube-controller-manager
             - kube-scheduler
             - nginx
+
+- name: Set up RBAC
+  hosts: kube-controller-1
+  roles:
+    - rbac

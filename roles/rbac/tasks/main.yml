@@ -1,0 +1,31 @@
+---
+- name: Create files
+  become: true
+  ansible.builtin.template:
+    src: "{{ item }}.j2"
+    dest: "{{ item }}.yml"
+    force: yes
+    mode: '0644'
+  loop:
+    - clusterRole
+    - clusterRoleBinding
+
+- name: Apply Kubernetes RBAC
+  become: true
+  block:
+
+    - name: Apply ClusterRole using kubectl
+      command: "kubectl apply --kubeconfig {{ certs_dir }}/admin.kubeconfig -f clusterRole.yml"
+      register: kubectl_output
+
+    - name: Display kubectl output
+      debug:
+        msg: "{{ kubectl_output.stdout }}"
+
+    - name: Apply ClusterRoleBinding using kubectl
+      command: "kubectl apply --kubeconfig {{ certs_dir }}/admin.kubeconfig -f clusterRoleBinding.yml"
+      register: kubectl_output
+
+    - name: Display kubectl output
+      debug:
+        msg: "{{ kubectl_output.stdout }}"
