@@ -1,13 +1,4 @@
 ---
-- name: Ensure required directories exist
-  become: true
-  file:
-    path: "{{ item }}"
-    state: directory
-    mode: '0755'
-  loop:
-    - "{{ var_lib_kubernetes_dir }}"
-
 - name: Install nginx
   become: true
   apt:
@@ -15,13 +6,31 @@
     state: present
     update_cache: yes
 
+- name: Ensure required directories exist
+  become: true
+  file:
+    path: /etc/nginx/tcpconf.d
+    state: directory
+    mode: '0755'
+  when: "'loadbalancer' in inventory_hostname"
+
 - name: Create nginx conf file 
   become: true
   ansible.builtin.template:
-    src: "nginx.j2"
+    src: "controller.j2"
     dest: /etc/nginx/sites-available/kubernetes.default.svc.cluster.local
     force: yes
     mode: '0644'
+  when: "'controller' in inventory_hostname"
+
+- name: Create nginx conf file 
+  become: true
+  ansible.builtin.template:
+    src: "loadbalancer.j2"
+    dest: /etc/nginx/tcpconf.d/kubernetes.conf
+    force: yes
+    mode: '0644'
+  when: "'loadbalancer' in inventory_hostname"
 
 - name: Create symbolic link for nginx site configuration
   become: true
@@ -29,6 +38,54 @@
     src: /etc/nginx/sites-available/kubernetes.default.svc.cluster.local
     dest: /etc/nginx/sites-enabled/kubernetes.default.svc.cluster.local
     state: link
+  when: "'controller' in inventory_hostname"
+
+- name: Ensure service is enabled and running
+  become: true
+  block:
+    - name: Install stream module
+      ansible.builtin.apt:
+        name: libnginx-mod-stream
+        state: present
+
+    # - name: Check if line already exists
+    #   ansible.builtin.lineinfile:
+    #     path: /etc/nginx/nginx.conf
+    #     regexp: '^\s*load_module\s+/usr/lib/nginx/modules/ngx_stream_module.so\*;\s*$'
+    #     state: absent
+    #   check_mode: yes
+    #   register: line_check
+    #   changed_when: false
+
+    # - name: Append include line if missing
+    #   ansible.builtin.lineinfile:
+    #     path: /etc/nginx/nginx.conf
+    #     line: 'load_module /usr/lib/nginx/modules/ngx_stream_module.so;'
+    #     insertafter: BOF
+    #   when: not line_check.found
+
+    - name: Check if line already exists
+      ansible.builtin.lineinfile:
+        path: /etc/nginx/nginx.conf
+        regexp: '^\s*include\s+/etc/nginx/tcpconf.d/\*;\s*$'
+        state: absent
+      check_mode: yes
+      register: line_check
+      changed_when: false
+
+    - name: Append include line if missing
+      ansible.builtin.lineinfile:
+        path: /etc/nginx/nginx.conf
+        line: 'include /etc/nginx/tcpconf.d/*;'
+        insertafter: EOF
+      when: not line_check.found
+
+    - name: Validate Nginx configuration
+      ansible.builtin.command: nginx -t
+      changed_when: false
+      register: nginx_test
+      failed_when: nginx_test.rc != 0
+  when: "'loadbalancer' in inventory_hostname"
 
 # - name: Verify nginx health endpoint
 #   become: true

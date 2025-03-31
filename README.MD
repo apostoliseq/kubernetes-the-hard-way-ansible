@@ -80,3 +80,20 @@ kubectl get componentstatuses --kubeconfig data/certs/admin.kubeconfig
 
 # Check kube-apiserver healthcheck endpoint via http
 curl -H "Host: kubernetes.default.svc.cluster.local" -i http://127.0.0.1/healthz
+
+# Check loadbalancer health
+sudo nginx -s reload
+[notice] 27149#27149: signal process started
+
+curl -k https://localhost:6443/version
+{
+  "major": "1",
+  "minor": "32",
+  "gitVersion": "v1.32.0",
+  "gitCommit": "70d3cc986aa8221cd1dfb1121852688902d3bf53",
+  "gitTreeState": "clean",
+  "buildDate": "2024-12-11T17:59:15Z",
+  "goVersion": "go1.23.3",
+  "compiler": "gc",
+  "platform": "linux/amd64"
+}

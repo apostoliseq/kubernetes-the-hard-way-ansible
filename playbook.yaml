@@ -75,3 +75,26 @@
   hosts: kube-controller-1
   roles:
     - rbac
+
+- name: Set up Load Balancer
+  hosts: loadbalancer
+  roles:
+    - nginx
+  post_tasks:
+  - name: Ensure service is enabled and running
+    become: true
+    block:
+      - name: Reload systemd daemon
+        ansible.builtin.systemd:
+          daemon_reload: yes
+        changed_when: false
+
+      - name: Enable service
+        ansible.builtin.systemd:
+          name: nginx
+          enabled: yes
+
+      - name: Start service
+        ansible.builtin.systemd:
+          name: nginx
+          state: started
