@@ -4,6 +4,7 @@
     src: "{{ certs_dir }}/{{ item.file }}"
     dest: "{{ item.dest }}/{{ item.file }}"
     mode: 0644
+    force: false
   loop:
     - { file: "ca.pem", dest: "{{ certs_dir }}" }
     - { file: "{{ inventory_hostname }}-key.pem", dest: "{{ certs_dir }}" }
@@ -18,6 +19,7 @@
     src: "{{ certs_dir }}/{{ item.file }}"
     dest: "{{ item.dest }}/{{ item.file }}"
     mode: 0644
+    force: false
   loop:
     - { file: "{{ inventory_hostname }}.kubeconfig", dest: "{{ certs_dir }}" }
     - { file: "{{ inventory_hostname }}.kubeconfig", dest: "{{ etcd_dir }}" }

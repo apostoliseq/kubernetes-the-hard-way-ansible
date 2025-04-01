@@ -98,3 +98,8 @@
         ansible.builtin.systemd:
           name: nginx
           state: started
+
+- name: Cluster services checks
+  hosts: cluster
+  roles:
+    - checks

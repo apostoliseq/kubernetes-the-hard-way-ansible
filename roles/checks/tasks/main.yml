@@ -1,0 +1,43 @@
+---
+- name: Check etcd member list
+  become: true
+  shell: >
+    ETCDCTL_API=3 etcdctl member list
+    --endpoints=https://127.0.0.1:2379
+    --cacert={{ etcd_dir }}/ca.pem
+    --cert={{ etcd_dir }}/kubernetes.pem
+    --key={{ etcd_dir }}/kubernetes-key.pem
+  register: etcd_member_list
+  failed_when: etcd_member_list.rc != 0
+  changed_when: false
+  when: "'controller' in inventory_hostname"
+
+- name: Check etcd endpoint health
+  become: true
+  shell: >
+    ETCDCTL_API=3 etcdctl endpoint health
+    --endpoints=https://127.0.0.1:2379
+    --cacert={{ etcd_dir }}/ca.pem
+    --cert={{ etcd_dir }}/kubernetes.pem
+    --key={{ etcd_dir }}/kubernetes-key.pem
+  register: etcd_health
+  failed_when: etcd_health.rc != 0
+  changed_when: false
+  when: "'controller' in inventory_hostname"
+
+- name: Check Kubernetes component statuses
+  shell: kubectl get componentstatuses --kubeconfig data/certs/admin.kubeconfig
+  register: component_status
+  failed_when: component_status.rc != 0
+  changed_when: false
+  when: "'controller-1' in inventory_hostname"
+
+- name: Check kube-apiserver healthcheck endpoint
+  uri:
+    url: http://127.0.0.1/healthz
+    method: GET
+    headers:
+      Host: "kubernetes.default.svc.cluster.local"
+  register: api_health
+  failed_when: api_health.status != 200 or api_health.content != "ok"
+  when: "'controller' or 'loadbalancer' in inventory_hostname"

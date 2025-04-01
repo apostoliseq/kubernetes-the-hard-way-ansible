@@ -4,6 +4,7 @@
     src: "{{ certs_dir }}/ca.pem"
     dest: "{{ item }}/ca.pem"
     mode: 0644
+    force: false
   loop:
     - "{{ certs_dir }}"
     - "{{ etcd_dir }}"

@@ -4,6 +4,7 @@
     src: "{{ certs_dir }}/{{ item.file }}"
     dest: "{{ item.dest }}/{{ item.file }}"
     mode: 0644
+    force: false
   loop:
     - { file: "ca-key.pem", dest: "{{ certs_dir }}" }
     - { file: "ca.pem", dest: "{{ certs_dir }}" }
@@ -21,6 +22,7 @@
     src: "{{ certs_dir }}/{{ item.file }}"
     dest: "{{ item.dest }}/{{ item.file }}"
     mode: 0644
+    force: false
   loop:
     - { file: "admin.kubeconfig", dest: "{{ certs_dir }}" }
     - { file: "kube-controller-manager.kubeconfig", dest: "{{ certs_dir }}" }
@@ -35,6 +37,7 @@
     src: "{{ certs_dir }}/encryption-config.yaml"
     dest: "{{ item }}/encryption-config.yaml"
     mode: 0644
+    force: false
   loop:
     - "{{ certs_dir }}"
     - "{{ etcd_dir }}"

@@ -75,10 +75,29 @@ sudo ETCDCTL_API=3 etcdctl \
   --key=/etc/etcd/kubernetes-key.pem \
   endpoint health
 
+# Inspect the Problematic Secret in etcd
+sudo ETCDCTL_API=3 etcdctl \
+  --endpoints=https://127.0.0.1:2379 \
+  --cacert=/etc/etcd/ca.pem \
+  --cert=/etc/etcd/kubernetes.pem \
+  --key=/etc/etcd/kubernetes-key.pem \
+  get /registry/secrets/default/default-token-qcfzl
+
+# Delete the Problematic Secret in etcd
+sudo ETCDCTL_API=3 etcdctl \
+  --endpoints=https://127.0.0.1:2379 \
+  --cacert=/etc/etcd/ca.pem \
+  --cert=/etc/etcd/kubernetes.pem \
+  --key=/etc/etcd/kubernetes-key.pem \
+  del /registry/secrets/default/default-token-qcfzl
+
 # Check kube components status
 kubectl get componentstatuses --kubeconfig data/certs/admin.kubeconfig
 
-# Check kube-apiserver healthcheck endpoint via http
+# Check kube-apiserver status
+curl -k https://localhost:6443/version
+
+# Check kube-apiserver healthcheck endpoint via http from controller
 curl -H "Host: kubernetes.default.svc.cluster.local" -i http://127.0.0.1/healthz
 
 # Check loadbalancer health

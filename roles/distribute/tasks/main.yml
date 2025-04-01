@@ -17,7 +17,8 @@
       #!/bin/bash
 
       # Brutal Force-Kill
-      for service in etcd kube-apiserver kube-controller-manager kube-scheduler; do \
+      for service in etcd kube-apiserver kube-controller-manager kube-scheduler nginx; do \
+        sudo apt purge -y nginx
         sudo systemctl stop $service.service
         sudo systemctl disable $service.service
       done
