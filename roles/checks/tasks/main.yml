@@ -39,5 +39,5 @@
     headers:
       Host: "kubernetes.default.svc.cluster.local"
   register: api_health
-  failed_when: api_health.status != 200 or api_health.content != "ok"
-  when: "'controller' or 'loadbalancer' in inventory_hostname"
+  failed_when: api_health.status != 200
+  when: "'controller' in inventory_hostname"

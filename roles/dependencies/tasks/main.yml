@@ -5,7 +5,7 @@
     state: directory
     mode: '0755'
 
-- name: Ensure etcd binary
+- name: Download etcd binary
   get_url:
     url: https://github.com/coreos/etcd/releases/download/v{{ etcd_version }}/etcd-v{{ etcd_version }}-linux-amd64.tar.gz
     dest: "{{ downloads_dir }}/etcd-v{{ etcd_version }}-linux-amd64.tar.gz"
