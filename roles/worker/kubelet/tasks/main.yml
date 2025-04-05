@@ -1,0 +1,39 @@
+---
+- name: Ensure required directories
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ kubelet_data_dir }}"
+    - "{{ kubernetes_data_dir }}"
+
+- name: Ensure required files
+  become: true
+  copy:
+    src: "{{ certs_dir }}/{{ item.file }}"
+    dest: "{{ item.dest }}"
+    mode: 0644
+    force: false
+  loop:
+    - { file: "{{ inventory_hostname }}.pem", dest: "{{ kubelet_data_dir }}/{{ inventory_hostname }}.pem" }
+    - { file: "{{ inventory_hostname }}-key.pem", dest: "{{ kubelet_data_dir }}/{{ inventory_hostname }}-key.pem" }
+    - { file: "{{ inventory_hostname }}.kubeconfig", dest: "{{ kubelet_data_dir }}/kubeconfig" }
+    - { file: "ca.pem", dest: "{{ kubernetes_data_dir }}/ca.pem" }
+
+- name: Create {{ kubelet_data_dir }}/kubelet-config.yaml
+  become: true
+  ansible.builtin.template:
+    src: "config.j2"
+    dest: "{{ kubelet_data_dir }}/kubelet-config.yaml"
+    force: yes
+    mode: '0644'
+
+- name: Create /etc/systemd/system/kubelet.service Unit file 
+  become: true
+  ansible.builtin.template:
+    src: "kubelet.j2"
+    dest: /etc/systemd/system/kubelet.service
+    force: yes
+    mode: '0644'

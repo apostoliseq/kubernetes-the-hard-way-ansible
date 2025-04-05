@@ -1,4 +1,0 @@
----
-downloads_dir: data/downloads
-certs_dir: data/certs
-var_lib_kubernetes_dir: /var/lib/kubernetes

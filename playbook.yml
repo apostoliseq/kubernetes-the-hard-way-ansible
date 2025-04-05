@@ -1,0 +1,182 @@
+---
+- name: Ensure dependencies
+  hosts: localhost
+  roles:
+    - common/dependencies
+
+- name: Generate files
+  hosts: localhost
+  roles:
+    - common/generate
+
+- name: Distribute files
+  hosts: cluster
+  roles:
+    - common/distribute
+
+- name: Install kube-components
+  hosts: controllers
+  pre_tasks:
+    - name: Ensure directories
+      become: true
+      file:
+        path: /etc/kubernetes/config
+        state: directory
+        mode: '0755'
+  
+  roles:
+    - controller/etcd
+    - controller/kubernetes
+    - controller/kube-controller-manager
+    - controller/kube-scheduler
+    - nginx
+
+  post_tasks:
+    - name: Ensure service is enabled and running
+      become: true
+      block:
+        - name: Reload systemd daemon
+          ansible.builtin.systemd:
+            daemon_reload: yes
+          changed_when: false
+
+        - name: Enable service
+          ansible.builtin.systemd:
+            name: "{{ item }}"
+            enabled: yes
+          loop:
+            - etcd
+            - kube-apiserver
+            - kube-controller-manager
+            - kube-scheduler
+            - nginx
+
+        - name: Start service
+          ansible.builtin.systemd:
+            name: "{{ item }}"
+            state: started
+          loop:
+            - etcd
+            - kube-apiserver
+            - kube-controller-manager
+            - kube-scheduler
+            - nginx
+
+        - name: Gracefully reload nginx
+          shell: nginx -s reload
+          register: controller_nginx
+          failed_when: controller_nginx.rc != 0
+
+- name: Set up RBAC
+  hosts: kube-controller-1
+  roles:
+    - rbac
+
+- name: Set up Load Balancer
+  hosts: loadbalancer
+  roles:
+    - nginx
+
+  post_tasks:
+  - name: Ensure service is enabled and running
+    become: true
+    block:
+      - name: Reload systemd daemon
+        ansible.builtin.systemd:
+          daemon_reload: yes
+        changed_when: false
+
+      - name: Enable service
+        ansible.builtin.systemd:
+          name: nginx
+          enabled: yes
+
+      - name: Start service
+        ansible.builtin.systemd:
+          name: nginx
+          state: started
+
+      - name: Gracefully reload NGINX
+        shell: nginx -s reload
+        register: loadbalancer_nginx
+        failed_when: loadbalancer_nginx.rc != 0
+
+- name: Install kube-components
+  hosts: workers
+  pre_tasks:
+    - name: Ensure directories
+      become: true
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+      - /etc/cni/net.d 
+      - /opt/cni/bin
+      - /var/lib/kubelet
+      - /var/lib/kube-proxy
+      - /var/lib/kubernetes
+      - /var/run/kubernetes
+    
+    - name: Ensure dependencies
+      become: true
+      ansible.builtin.package:
+        name: "{{ item }}"
+        state: present
+      loop:
+      - socat
+      - conntrack
+      - ipset
+
+    - name: Untar crictl
+      become: true
+      unarchive:
+        src: "{{ downloads_dir }}/crictl-v{{ crictl_version }}-linux-amd64.tar.gz"
+        dest: /usr/local/bin
+        extra_opts: [--strip-components=1]
+        mode: '0755'
+
+    - name: Untar cni-plugins
+      become: true
+      unarchive:
+        src: "{{ downloads_dir }}/cni-plugins-amd64-v{{ cni_plugins_version }}.tgz"
+        dest: /opt/cni/bin/
+        extra_opts: [--strip-components=1]
+        mode: '0755'
+
+  roles:
+    - worker/containerd
+    - worker/kubelet
+    - worker/kube-proxy
+
+  post_tasks:
+    - name: Ensure service is enabled and running
+      become: true
+      block:
+        - name: Reload systemd daemon
+          ansible.builtin.systemd:
+            daemon_reload: yes
+          changed_when: false
+
+        - name: Enable service
+          ansible.builtin.systemd:
+            name: "{{ item }}"
+            enabled: yes
+          loop:
+            - containerd
+            - kubelet
+            - kube-proxy
+
+        - name: Start service
+          ansible.builtin.systemd:
+            name: "{{ item }}"
+            state: started
+          loop:
+            - containerd
+            - kubelet
+            - kube-proxy
+
+- name: Cluster services verification checks
+  hosts: cluster
+  roles:
+    - common/checks

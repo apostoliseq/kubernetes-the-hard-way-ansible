@@ -1,0 +1,34 @@
+---
+- name: Ensure required directories exist
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ kubernetes_data_dir }}"
+
+- name: Copy required files to {{ kubernetes_data_dir }}
+  become: true
+  copy:
+    src: "{{ certs_dir }}//kube-controller-manager.kubeconfig"
+    dest: "{{ kubernetes_data_dir }}/kube-controller-manager.kubeconfig"
+    mode: 0644
+    remote_src: true
+
+- name: Copy kube-controller-manager in /usr/local/bin
+  become: true
+  copy:
+      src: "{{ downloads_dir }}/kube-controller-manager"
+      dest: /usr/local/bin
+      owner: root
+      group: root
+      mode: '0755'
+
+- name: Create /etc/systemd/system/kube-controller-manager.service Unit file 
+  become: true
+  ansible.builtin.template:
+    src: "kube-controller-manager.j2"
+    dest: /etc/systemd/system/kube-controller-manager.service
+    force: yes
+    mode: '0644'

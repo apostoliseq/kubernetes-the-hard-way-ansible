@@ -1,0 +1,33 @@
+---
+- name: Ensure required directories
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ kube_proxy_data_dir }}"
+
+- name: Ensure required files
+  become: true
+  copy:
+    src: "{{ certs_dir }}/kube-proxy.kubeconfig"
+    dest: "{{ kube_proxy_data_dir }}/kubeconfig"
+    mode: 0644
+    force: false
+
+- name: Create {{ kube_proxy_data_dir }}/kube-proxy-config.yaml
+  become: true
+  ansible.builtin.template:
+    src: "config.j2"
+    dest: "{{ kube_proxy_data_dir }}/kube-proxy-config.yaml"
+    force: yes
+    mode: '0644'
+
+- name: Create /etc/systemd/system/kube-proxy.service Unit file 
+  become: true
+  ansible.builtin.template:
+    src: "kube-proxy.j2"
+    dest: /etc/systemd/system/kube-proxy.service
+    force: yes
+    mode: '0644'

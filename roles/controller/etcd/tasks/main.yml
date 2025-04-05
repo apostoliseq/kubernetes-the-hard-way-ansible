@@ -1,0 +1,26 @@
+---
+- name: Ensure required directories exist
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ etcd_dir }}"
+    - "{{ etcd_data_dir }}"
+
+- name: Untar etcd-v{{ etcd_version }}-linux-amd64.tar.gz to /usr/local/bin
+  become: true
+  unarchive:
+      src: "{{ downloads_dir }}/etcd-v{{ etcd_version }}-linux-amd64.tar.gz"
+      dest: /usr/local/bin
+      extra_opts: [--strip-components=1]
+      mode: '0755'
+
+- name: Create /etc/systemd/system/etcd.service Unit file 
+  become: true
+  ansible.builtin.template:
+    src: etcd.j2
+    dest: /etc/systemd/system/etcd.service
+    force: yes
+    mode: '0644'

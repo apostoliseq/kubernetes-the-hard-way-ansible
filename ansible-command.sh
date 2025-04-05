@@ -1,7 +1,7 @@
 #!/bin/bash
 
-ansible-playbook playbook.yaml --ask-become-pass
-# ansible-playbook playbook.yaml --ask-become-pass -vvvv
+ansible-playbook playbook.yml --ask-become-pass
+# ansible-playbook playbook.yml --ask-become-pass -vvv
 
 # if [ -z "$1" ]; then
 #     echo "Usage: $0 <playbook-file> [ansible-playbook-options]"

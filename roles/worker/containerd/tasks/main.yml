@@ -1,0 +1,33 @@
+---
+- name: Ensure required directories exist
+  become: true
+  file:
+    path: "{{ item }}"
+    state: directory
+    mode: '0755'
+  loop:
+    - "{{ containerd_dir }}"
+
+- name: Untar containerd-v{{ containerd_version }}.linux-amd64.tar.gz to /usr/bin
+  become: true
+  unarchive:
+    src: "{{ downloads_dir }}/containerd-v{{ containerd_version }}.linux-amd64.tar.gz"
+    dest: /usr/bin
+    extra_opts: [--strip-components=1]
+    mode: '0755'
+
+- name: Create /etc/containerd/config.toml
+  become: true
+  ansible.builtin.template:
+    src: config.j2
+    dest: /etc/containerd/config.toml
+    force: yes
+    mode: '0644'
+
+- name: Create /etc/systemd/system/containerd.service Unit file 
+  become: true
+  ansible.builtin.template:
+    src: containerd.j2
+    dest: /etc/systemd/system/containerd.service
+    force: yes
+    mode: '0644'

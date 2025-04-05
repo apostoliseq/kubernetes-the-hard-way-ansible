@@ -1,0 +1,40 @@
+- name: Distribute worker certs
+  become: true
+  copy:
+    src: "{{ certs_dir }}/{{ item.file }}"
+    dest: "{{ item.dest }}/{{ item.file }}"
+    mode: 0644
+    force: false
+  loop:
+    - { file: "ca.pem", dest: "{{ certs_dir }}" }
+    - { file: "{{ inventory_hostname }}-key.pem", dest: "{{ certs_dir }}" }
+    - { file: "{{ inventory_hostname }}.pem", dest: "{{ certs_dir }}" }
+    - { file: "ca.pem", dest: "{{ etcd_dir }}" }
+    - { file: "{{ inventory_hostname }}-key.pem", dest: "{{ etcd_dir }}" }
+    - { file: "{{ inventory_hostname }}.pem", dest: "{{ etcd_dir }}" }
+
+- name: Distribute worker kubeconfigs
+  become: true
+  copy:
+    src: "{{ certs_dir }}/{{ item.file }}"
+    dest: "{{ item.dest }}/{{ item.file }}"
+    mode: 0644
+    force: false
+  loop:
+    - { file: "{{ inventory_hostname }}.kubeconfig", dest: "{{ certs_dir }}" }
+    - { file: "{{ inventory_hostname }}.kubeconfig", dest: "{{ etcd_dir }}" }
+    - { file: "kube-proxy.kubeconfig", dest: "{{ certs_dir }}" }
+    - { file: "kube-proxy.kubeconfig", dest: "{{ etcd_dir }}" }
+
+- name: Copy binaries in /usr/local/bin
+  become: true
+  copy:
+      src: "{{ downloads_dir }}/{{ item }}"
+      dest: /usr/local/bin
+      mode: '0755'
+  loop:
+    - kubectl
+    - kube-proxy
+    - kubelet
+    - runc
+    - runsc

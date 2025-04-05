@@ -60,6 +60,7 @@ ansible all -m apt -a update_cache=true --become --ask-become-pass
     - **Use Case**: Variables defined here are not meant to be overridden by users (unlike defaults/).
     - **Example**: vars/main.yml might define internal variables used by the role.
 
+# CONTROLLER SERVICES CHECKS
 # Check etcd member list
 sudo ETCDCTL_API=3 etcdctl member list \
   --endpoints=https://127.0.0.1:2379 \
@@ -102,17 +103,7 @@ curl -H "Host: kubernetes.default.svc.cluster.local" -i http://127.0.0.1/healthz
 
 # Check loadbalancer health
 sudo nginx -s reload
-[notice] 27149#27149: signal process started
 
-curl -k https://localhost:6443/version
-{
-  "major": "1",
-  "minor": "32",
-  "gitVersion": "v1.32.0",
-  "gitCommit": "70d3cc986aa8221cd1dfb1121852688902d3bf53",
-  "gitTreeState": "clean",
-  "buildDate": "2024-12-11T17:59:15Z",
-  "goVersion": "go1.23.3",
-  "compiler": "gc",
-  "platform": "linux/amd64"
-}
+# WORKER SERVICES CHECKS
+# Check if workers have succesfully registered themselves with the cluster (FROM A CONTROLLER NODE)
+kubectl get nodes

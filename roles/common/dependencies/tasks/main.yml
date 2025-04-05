@@ -1,0 +1,55 @@
+---
+- name: Ensure "{{ downloads_dir }}" exists
+  file:
+    path: "{{ downloads_dir }}"
+    state: directory
+    mode: '0755'
+
+- name: Download etcd binary
+  get_url:
+    url: https://github.com/coreos/etcd/releases/download/v{{ etcd_version }}/etcd-v{{ etcd_version }}-linux-amd64.tar.gz
+    dest: "{{ downloads_dir }}/etcd-v{{ etcd_version }}-linux-amd64.tar.gz"
+    mode: '0755'
+
+- name: Download crictl binary
+  get_url:
+    url: https://github.com/kubernetes-incubator/cri-tools/releases/download/v{{ crictl_version }}/crictl-v{{ crictl_version }}-linux-amd64.tar.gz
+    dest: "{{ downloads_dir }}/crictl-v{{ crictl_version }}-linux-amd64.tar.gz"
+    mode: '0755'
+
+- name: Download runsc binary
+  get_url:
+    url: https://storage.googleapis.com/gvisor/releases/release/latest/x86_64/runsc
+    dest: "{{ downloads_dir }}/runsc"
+    mode: '0755'
+
+- name: Download runc binary
+  get_url:
+    url: https://github.com/opencontainers/runc/releases/download/v{{ runsc_version }}/runc.amd64
+    dest: "{{ downloads_dir }}/runc"
+    mode: '0755'
+
+- name: Download cni plugins binary
+  get_url:
+    url: https://github.com/containernetworking/plugins/releases/download/v{{ cni_plugins_version }}/cni-plugins-linux-amd64-v{{ cni_plugins_version }}.tgz
+    dest: "{{ downloads_dir }}/cni-plugins-amd64-v{{ cni_plugins_version }}.tgz"
+    mode: '0755'
+
+- name: Download containerd binary
+  get_url:
+    url: https://github.com/containerd/containerd/releases/download/v{{ containerd_version }}/containerd-{{ containerd_version }}-linux-amd64.tar.gz
+    dest: "{{ downloads_dir }}/containerd-v{{ containerd_version }}.linux-amd64.tar.gz"
+    mode: '0755'
+
+- name: Download kubernetes binaries
+  get_url:
+    url: "https://dl.k8s.io/v{{ component_version }}/bin/linux/amd64/{{ item }}"
+    dest: "{{ downloads_dir }}/{{ item }}"
+    mode: '0755'
+  loop:
+    - kube-apiserver
+    - kube-controller-manager
+    - kube-scheduler
+    - kubectl
+    - kube-proxy
+    - kubelet

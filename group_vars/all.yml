@@ -1,0 +1,21 @@
+# Best for: Cluster-wide variables (e.g., versions, download paths).
+# Variables defined here apply to all hosts.
+downloads_dir: "data/downloads"
+certs_dir: "data/certs"
+csrs_dir: "data/csrs"
+etcd_dir: "/etc/etcd"
+kubernetes_data_dir: "/var/lib/kubernetes"
+
+cluster_name: "kubernetes-the-hard-way"
+profile: "kubernetes"
+
+etcd_version: "3.5.21"
+component_version: "1.32.0"
+crictl_version: "1.32.0"
+runsc_version: "1.2.6"
+runc_version: "1.2.6"
+cni_plugins_version: "1.6.2"
+containerd_version: "2.0.4"
+
+# initial_cluster_state: "{{ 'new' if 'kube-controller-1' in inventory_hostname else 'existing' }}"
+# etcd_token: "{{ 0 if 'kube-controller-1' in inventory_hostname else 1 }}"
