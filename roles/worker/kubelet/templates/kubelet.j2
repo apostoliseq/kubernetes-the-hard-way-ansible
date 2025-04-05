@@ -9,8 +9,7 @@ ExecStart=/usr/local/bin/kubelet \
     --config={{ kubelet_data_dir }}/kubelet-config.yaml \
     --kubeconfig={{ kubelet_data_dir }}/kubeconfig \
     --v=2 \
-    --hostname-override={{ inventory_hostname }} \
-    --fail-swap-on=false
+    --hostname-override={{ inventory_hostname }}
 Restart=on-failure
 RestartSec=5
 

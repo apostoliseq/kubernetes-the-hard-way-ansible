@@ -1,5 +1,7 @@
 # Best for: If nodes have identical configurations
 # Applies to kube-workers
 containerd_dir: "/etc/containerd"
+cni_config_dir: "/etc/cni/net.d"
+cni_exec_dir: "/opt/cni/bin"
 kube_proxy_data_dir: "/var/lib/kube-proxy"
 kubelet_data_dir: "/var/lib/kubelet"

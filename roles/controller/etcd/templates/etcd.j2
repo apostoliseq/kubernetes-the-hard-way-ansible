@@ -11,8 +11,6 @@ ExecStart=/usr/local/bin/etcd \
   --peer-key-file={{ etcd_dir }}/kubernetes-key.pem \
   --trusted-ca-file={{ etcd_dir }}/ca.pem \
   --peer-trusted-ca-file={{ etcd_dir }}/ca.pem \
-  --peer-client-cert-auth \
-  --client-cert-auth \
   --initial-advertise-peer-urls https://{{ ansible_default_ipv4.address }}:2380 \
   --listen-peer-urls https://{{ ansible_default_ipv4.address }}:2380 \
   --listen-client-urls https://{{ ansible_default_ipv4.address }}:2379,https://127.0.0.1:2379 \

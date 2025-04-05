@@ -1,13 +1,4 @@
 ---
-- name: Ensure required directories exist
-  become: true
-  file:
-    path: "{{ item }}"
-    state: directory
-    mode: '0755'
-  loop:
-    - "{{ kubernetes_data_dir }}"
-
 - name: Copy required files to {{ kubernetes_data_dir }}
   become: true
   copy:

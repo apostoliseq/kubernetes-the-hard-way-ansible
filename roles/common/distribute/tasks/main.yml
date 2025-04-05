@@ -27,12 +27,17 @@
       sudo rm -rf \
         {{ certs_dir }} \
         {{ etcd_dir }} \
+        {{ etcd_data_dir }} \
         /etc/systemd/system/etcd.service \
         /etc/systemd/system/kube-* \
-        /var/lib/kubernetes/*
+        {{ kubernetes_data_dir }}/*
       
       # Clean binaries
       sudo rm -rf /usr/local/bin/*
+
+      # Clear kubernetes secrets
+      kubectl --kubeconfig data/certs/admin.kubeconfig delete clusterrolebinding system:kube-apiserver
+      kubectl --kubeconfig data/certs/admin.kubeconfig delete clusterrole system:kube-apiserver-to-kubelet
 
       echo "Environment reset complete"
     mode: 0755
@@ -54,12 +59,13 @@
       # Clean services and files
       sudo rm -rf \
         {{ certs_dir }} \
-        /etc/cni/net.d \
-        /opt/cni/bin \
-        /var/lib/kubelet \
-        /var/lib/kube-proxy \
-        /var/lib/kubernetes/* \
+        {{ cni_config_dir }} \
+        {{ cni_exec_dir }} \
+        {{ kube_proxy_data_dir }} \
+        {{ kubelet_data_dir }} \
+        {{ kubernetes_data_dir }}/* \
         /var/run/kubernetes/* \
+        /etc/cni/net.d/* \
         /etc/systemd/system/kubectl.service \
         /etc/systemd/system/kube-proxy.service \
         /etc/systemd/system/kubelet.service

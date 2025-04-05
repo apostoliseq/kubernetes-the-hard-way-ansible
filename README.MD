@@ -60,7 +60,17 @@ ansible all -m apt -a update_cache=true --become --ask-become-pass
     - **Use Case**: Variables defined here are not meant to be overridden by users (unlike defaults/).
     - **Example**: vars/main.yml might define internal variables used by the role.
 
+# CLUSTER CHECKS
+kubectl cluster-info --kubeconfig data/certs/admin.kubeconfig
+kubectl cluster-info dump --kubeconfig data/certs/admin.kubeconfig
+
 # CONTROLLER SERVICES CHECKS
+sudo systemctl status etcd kube-apiserver kube-controller-manager kube-scheduler
+
+for service in etcd kube-apiserver kube-controller-manager kube-scheduler; do echo "$service:"; journalctl -u $service --no-pager -n 15; echo ""; done
+
+for file in /etc/containerd/config.toml /etc/cni/net.d/10-containerd-net.conflist /var/lib/kubelet/kubelet-config.yaml /var/lib/kube-proxy/kube-proxy-config.yaml /etc/sysctl.conf; do echo "$file:"; cat $file; echo ""; done
+
 # Check etcd member list
 sudo ETCDCTL_API=3 etcdctl member list \
   --endpoints=https://127.0.0.1:2379 \
@@ -101,9 +111,26 @@ curl -k https://localhost:6443/version
 # Check kube-apiserver healthcheck endpoint via http from controller
 curl -H "Host: kubernetes.default.svc.cluster.local" -i http://127.0.0.1/healthz
 
+# LOADBALANCER SERVICES CHECKS
 # Check loadbalancer health
 sudo nginx -s reload
 
 # WORKER SERVICES CHECKS
 # Check if workers have succesfully registered themselves with the cluster (FROM A CONTROLLER NODE)
 kubectl get nodes
+
+sudo systemctl status containerd kubelet kube-proxy
+
+for service in containerd kubelet kube-proxy; do echo "$service:"; journalctl -u $service --no-pager -n 15; echo ""; done
+
+for file in /etc/containerd/config.toml /etc/cni/net.d/10-containerd-net.conflist /var/lib/kubelet/kubelet-config.yaml /var/lib/kube-proxy/kube-proxy-config.yaml /etc/sysctl.conf; do echo "$file:"; cat $file; echo ""; done
+
+
+Apr 05 21:20:48 kube-worker-2 kube-proxy[126620]:         ip6tables-restore v1.8.10 (nf_tables): unknown option "--xor-mark"
+Apr 05 21:20:48 kube-worker-2 kube-proxy[126620]:         Error occurred at line: 11
+Apr 05 21:20:48 kube-worker-2 kube-proxy[126620]:         Try `ip6tables-restore -h' or 'ip6tables-restore --help' for more information.
+Apr 05 21:20:48 kube-worker-2 kube-proxy[126620]:  > ipFamily="IPv6" rules="*nat\n:KUBE-SERVICES - [0:0]\n:KUBE-POSTROUTING - [0:0]\n:KUBE-NODE-PORT - [0:0]\n:KUBE-LOAD-BALANCER - [0:0]\n:KUBE-MARK-MAS>
+Apr 05 21:21:18 kube-worker-2 kube-proxy[126620]: E0405 21:21:18.936442  126620 proxier.go:1445] "Failed to execute iptables-restore" err=<
+Apr 05 21:21:18 kube-worker-2 kube-proxy[126620]:         exit status 2: Warning: Extension MARK revision 0 not supported, missing kernel module?
+
+Solution: Downgraded Kernel version from 6.8.0-56-generic to 6.8.0-31-generic
