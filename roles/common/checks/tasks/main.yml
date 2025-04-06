@@ -41,27 +41,3 @@
   register: api_health
   failed_when: api_health.status != 200
   when: "'controller' in inventory_hostname"
-
-- name: Systemctl service check
-  become: true
-  shell: >
-    systemctl status containerd kubelet kube-proxy
-  changed_when: false
-  when: "'worker' in inventory_hostname"
-
-- name: Journalctl check
-  become: true
-  shell: >
-    for service in containerd kubelet kube-proxy; do \
-    echo "$service:"; \
-    journalctl -u $service --no-pager -n 15; \
-    echo ""; done
-  changed_when: false
-  when: "'worker' in inventory_hostname"
-
-- name: Check Kubernetes worker nodes
-  shell: kubectl get nodes
-  register: worker_status
-  changed_when: false
-  failed_when: worker_status.rc != 0
-  when: "'controller-1' in inventory_hostname"

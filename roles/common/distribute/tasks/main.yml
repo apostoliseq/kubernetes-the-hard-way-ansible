@@ -27,7 +27,8 @@
       sudo rm -rf \
         {{ certs_dir }} \
         {{ etcd_dir }} \
-        {{ etcd_data_dir }} \
+        /var/lib/etcd \
+        /home/apostoliseq/.kube \
         /etc/systemd/system/etcd.service \
         /etc/systemd/system/kube-* \
         {{ kubernetes_data_dir }}/*

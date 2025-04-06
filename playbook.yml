@@ -167,15 +167,6 @@
             - kube-proxy
             - containerd
 
-        - name: Restart service
-          ansible.builtin.systemd:
-            name: "{{ item }}"
-            state: restarted
-          loop:
-            - kubelet
-            - kube-proxy
-            - containerd
-
 - name: Cluster services verification checks
   hosts: cluster
   roles:

@@ -2,7 +2,7 @@
 - name: Copy required files to {{ kubernetes_data_dir }}
   become: true
   copy:
-    src: "{{ certs_dir }}//kube-controller-manager.kubeconfig"
+    src: "{{ certs_dir }}/kube-controller-manager.kubeconfig"
     dest: "{{ kubernetes_data_dir }}/kube-controller-manager.kubeconfig"
     mode: 0644
     remote_src: true

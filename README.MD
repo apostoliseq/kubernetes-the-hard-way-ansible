@@ -86,24 +86,8 @@ sudo ETCDCTL_API=3 etcdctl \
   --key=/etc/etcd/kubernetes-key.pem \
   endpoint health
 
-# Inspect the Problematic Secret in etcd
-sudo ETCDCTL_API=3 etcdctl \
-  --endpoints=https://127.0.0.1:2379 \
-  --cacert=/etc/etcd/ca.pem \
-  --cert=/etc/etcd/kubernetes.pem \
-  --key=/etc/etcd/kubernetes-key.pem \
-  get /registry/secrets/default/default-token-qcfzl
-
-# Delete the Problematic Secret in etcd
-sudo ETCDCTL_API=3 etcdctl \
-  --endpoints=https://127.0.0.1:2379 \
-  --cacert=/etc/etcd/ca.pem \
-  --cert=/etc/etcd/kubernetes.pem \
-  --key=/etc/etcd/kubernetes-key.pem \
-  del /registry/secrets/default/default-token-qcfzl
-
 # Check kube components status
-kubectl get componentstatuses --kubeconfig data/certs/admin.kubeconfig
+kubectl --kubeconfig data/certs/admin.kubeconfig get componentstatuses
 
 # Check kube-apiserver status
 curl -k https://localhost:6443/version
@@ -117,11 +101,11 @@ sudo nginx -s reload
 
 # WORKER SERVICES CHECKS
 # Check if workers have succesfully registered themselves with the cluster (FROM A CONTROLLER NODE)
-kubectl get nodes
+kubectl --kubeconfig data/certs/admin.kubeconfig get nodes
 
 sudo systemctl status containerd kubelet kube-proxy
 
-for service in containerd kubelet kube-proxy; do echo "$service:"; journalctl -u $service --no-pager -n 15; echo ""; done
+for service in containerd kubelet kube-proxy; do echo "$service:"; journalctl -u $service --no-pager -n 25; echo ""; done
 
 for file in /etc/containerd/config.toml /etc/cni/net.d/10-containerd-net.conflist /var/lib/kubelet/kubelet-config.yaml /var/lib/kube-proxy/kube-proxy-config.yaml /etc/sysctl.conf; do echo "$file:"; cat $file; echo ""; done
 
