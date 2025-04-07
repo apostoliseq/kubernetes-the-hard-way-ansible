@@ -1,0 +1,45 @@
+- name: Ensure no conflicting SSH tunnel
+  shell: |
+    # Check if tunnel exists first
+    if pgrep -f 'ssh.*-L 6443:localhost:6443'; then
+      pkill -f 'ssh.*-L 6443:localhost:6443'
+      sleep 1  # Give it time to terminate
+    fi
+  ignore_errors: yes
+  changed_when: false
+
+- name: Create persistent SSH tunnel
+  shell: |
+    nohup ssh -N \
+      -i ~/.ssh/ed25519-ansible \
+      -L 6443:localhost:6443 \
+      {{ hostvars['kube-loadbalancer']['ansible_host'] }} &> /dev/null &
+
+- name: Verify SSH tunnel
+  wait_for:
+    host: localhost
+    port: 6443
+    timeout: 30
+  register: tunnel_check
+  until: tunnel_check is success
+  retries: 3
+  delay: 5
+
+- name: Configure kubectl
+  shell: |
+    kubectl config set-cluster {{ cluster_name }} \
+    --certificate-authority={{ certs_dir }}/ca.pem \
+    --embed-certs=true \
+    --server=https://localhost:6443
+
+    kubectl config set-credentials admin \
+    --client-certificate={{ certs_dir }}/admin.pem \
+    --client-key={{ certs_dir }}/admin-key.pem \
+    --embed-certs=true
+
+    kubectl config set-context {{ cluster_name }} \
+    --cluster={{ cluster_name }} \
+    --user=admin
+
+    kubectl config use-context {{ cluster_name }}
+  when: tunnel_check is success

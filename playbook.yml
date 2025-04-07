@@ -14,7 +14,7 @@
   roles:
     - common/distribute
 
-- name: Install kube-components
+- name: Set up controllers
   hosts: controllers
   pre_tasks:
     - name: Ensure directories
@@ -104,7 +104,7 @@
         register: loadbalancer_nginx
         failed_when: loadbalancer_nginx.rc != 0
 
-- name: Install kube-components
+- name: Set up workers
   hosts: workers
   pre_tasks:
     - name: Ensure directories
@@ -166,6 +166,11 @@
             - kubelet
             - kube-proxy
             - containerd
+
+- name: Set up workstation
+  hosts: localhost
+  roles:
+    - access
 
 - name: Cluster services verification checks
   hosts: cluster

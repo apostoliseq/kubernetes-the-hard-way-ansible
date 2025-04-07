@@ -9,3 +9,17 @@
     - name: Display script output
       debug:
         var: script_output.stdout_lines
+
+- name: Reset localhost
+  hosts: localhost
+  tasks:
+    - name: Delete generated files
+      shell: rm -rf {{ certs_dir }} {{ csrs_dir }}
+
+    - name: Run the script
+      shell: rm ~/.kube/config
+      register: rm_output
+
+    - name: Display script output
+      debug:
+        var: rm_output.stdout_lines
