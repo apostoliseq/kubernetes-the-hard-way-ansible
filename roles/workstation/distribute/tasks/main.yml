@@ -1,7 +1,7 @@
 ---
 - name: Ensure required directories exist
   become: true
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     mode: '0755'
@@ -11,7 +11,7 @@
 
 - name: Create reset-env.sh script for cleaning up controller VMs
   become: true
-  copy:
+  ansible.builtin.copy:
     dest: reset-env.sh
     content: |
       #!/bin/bash
@@ -46,7 +46,7 @@
 
 - name: Create reset-env.sh script for cleaning up worker VMs
   become: true
-  copy:
+  ansible.builtin.copy:
     dest: reset-env.sh
     content: |
       #!/bin/bash

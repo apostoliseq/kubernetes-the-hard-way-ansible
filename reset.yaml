@@ -3,7 +3,7 @@
   tasks:
     - name: Run the script
       become: true
-      shell: /home/apostoliseq/reset-env.sh
+      ansible.builtin.shell: /home/apostoliseq/reset-env.sh
       register: script_output
 
     - name: Display script output
@@ -14,10 +14,12 @@
   hosts: localhost
   tasks:
     - name: Delete generated files
-      shell: rm -rf {{ certs_dir }} {{ csrs_dir }}
+      ansible.builtin.shell: rm -rf {{ certs_dir }} {{ csrs_dir }}
+      ignore_errors: yes
 
     - name: Run the script
-      shell: rm ~/.kube/config
+      ansible.builtin.shell: rm ~/.kube/config
+      ignore_errors: yes
       register: rm_output
 
     - name: Display script output

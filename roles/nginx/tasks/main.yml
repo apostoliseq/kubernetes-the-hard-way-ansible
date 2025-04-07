@@ -1,14 +1,14 @@
 ---
 - name: Install nginx
   become: true
-  apt:
+  ansible.builtin.apt:
     name: nginx
     state: present
     update_cache: yes
 
 - name: Ensure required directories exist
   become: true
-  file:
+  ansible.builtin.file:
     path: /etc/nginx/tcpconf.d
     state: directory
     mode: '0755'
@@ -34,7 +34,7 @@
 
 - name: Create symbolic link for nginx site configuration
   become: true
-  file:
+  ansible.builtin.file:
     src: /etc/nginx/sites-available/kubernetes.default.svc.cluster.local
     dest: /etc/nginx/sites-enabled/kubernetes.default.svc.cluster.local
     state: link

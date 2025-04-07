@@ -1,7 +1,7 @@
 ---
 - name: Ensure required directories
   become: true
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     mode: '0755'
@@ -10,7 +10,7 @@
 
 - name: Ensure required files
   become: true
-  copy:
+  ansible.builtin.copy:
     src: "{{ certs_dir }}/kube-proxy.kubeconfig"
     dest: "{{ kube_proxy_data_dir }}/kubeconfig"
     mode: 0644

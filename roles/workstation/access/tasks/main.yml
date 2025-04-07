@@ -1,32 +1,27 @@
 - name: Ensure no conflicting SSH tunnel
-  shell: |
-    # Check if tunnel exists first
+  ansible.builtin.shell: |
     if pgrep -f 'ssh.*-L 6443:localhost:6443'; then
       pkill -f 'ssh.*-L 6443:localhost:6443'
-      sleep 1  # Give it time to terminate
+      sleep 1
     fi
   ignore_errors: yes
   changed_when: false
 
 - name: Create persistent SSH tunnel
-  shell: |
+  ansible.builtin.shell: |
     nohup ssh -N \
       -i ~/.ssh/ed25519-ansible \
       -L 6443:localhost:6443 \
       {{ hostvars['kube-loadbalancer']['ansible_host'] }} &> /dev/null &
 
 - name: Verify SSH tunnel
-  wait_for:
+  ansible.builtin.wait_for:
     host: localhost
     port: 6443
-    timeout: 30
   register: tunnel_check
-  until: tunnel_check is success
-  retries: 3
-  delay: 5
 
 - name: Configure kubectl
-  shell: |
+  ansible.builtin.shell: |
     kubectl config set-cluster {{ cluster_name }} \
     --certificate-authority={{ certs_dir }}/ca.pem \
     --embed-certs=true \

@@ -1,10 +1,10 @@
 - name: Generete a self-signed CA certificate using the CSR defined in ca-csr.json
-  shell: |
+  ansible.builtin.shell: |
     cfssl gencert -initca {{ csrs_dir }}/ca-csr.json | cfssljson -bare {{ certs_dir }}/ca
   register: "output"
 
 - name: Generete certificates that use -hostname, signed by the CA
-  shell: |
+  ansible.builtin.shell: |
     cfssl gencert \
     -ca={{ certs_dir }}/ca.pem \
     -ca-key={{ certs_dir }}/ca-key.pem \
@@ -21,7 +21,7 @@
       hostnames: "10.32.0.1,{{ hostvars['kube-controller-1']['ansible_host'] }},kube-controller-1,{{ hostvars['kube-controller-2']['ansible_host'] }},kube-controller-2,{{ hostvars['kube-loadbalancer']['ansible_host'] }},kube-loadbalancer,127.0.0.1,localhost,kubernetes.default"
 
 - name: Generete the rest of the certificates, signed by the CA
-  shell: |
+  ansible.builtin.shell: |
     cfssl gencert \
     -ca={{ certs_dir }}/ca.pem \
     -ca-key={{ certs_dir }}/ca-key.pem \

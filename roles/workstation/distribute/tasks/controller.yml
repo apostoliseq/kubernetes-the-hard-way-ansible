@@ -1,6 +1,6 @@
 - name: Distribute controller certs
   become: true
-  copy:
+  ansible.builtin.copy:
     src: "{{ certs_dir }}/{{ item.file }}"
     dest: "{{ item.dest }}/{{ item.file }}"
     mode: 0644
@@ -18,7 +18,7 @@
 
 - name: Distribute controller kubeconfigs
   become: true
-  copy:
+  ansible.builtin.copy:
     src: "{{ certs_dir }}/{{ item.0 }}"
     dest: "{{ item.1 }}/{{ item.0 }}"
     mode: 0644
@@ -26,25 +26,10 @@
   with_nested:
     - [ "admin.kubeconfig", "kube-controller-manager.kubeconfig", "kube-scheduler.kubeconfig" ]
     - [ "{{ certs_dir }}", "{{ etcd_dir }}"]
-# - name: Distribute controller kubeconfigs
-#   become: true
-#   copy:
-#     src: "{{ certs_dir }}/{{ item.file }}"
-#     dest: "{{ item.dest }}/{{ item.file }}"
-#     mode: 0644
-#     force: false
-#   loop:
-#     - { file: "admin.kubeconfig", dest: "{{ certs_dir }}" }
-#     - { file: "kube-controller-manager.kubeconfig", dest: "{{ certs_dir }}" }
-#     - { file: "kube-scheduler.kubeconfig", dest: "{{ certs_dir }}" }
-#     - { file: "admin.kubeconfig", dest: "{{ etcd_dir }}" }
-#     - { file: "kube-controller-manager.kubeconfig", dest: "{{ etcd_dir }}" }
-#     - { file: "kube-scheduler.kubeconfig", dest: "{{ etcd_dir }}" }
-
 
 - name: Distribute controller encryption-config.yaml
   become: true
-  copy:
+  ansible.builtin.copy:
     src: "{{ certs_dir }}/encryption-config.yaml"
     dest: "{{ item }}/encryption-config.yaml"
     mode: 0644
@@ -55,7 +40,7 @@
 
 - name: Copy kubectl in /usr/local/bin
   become: true
-  copy:
+  ansible.builtin.copy:
       src: "{{ downloads_dir }}/kubectl"
       dest: /usr/local/bin
       mode: '0755'

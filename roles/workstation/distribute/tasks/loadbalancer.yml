@@ -1,6 +1,6 @@
 - name: Distribute loadbalancer ca.pem
   become: true
-  copy:
+  ansible.builtin.copy:
     src: "{{ certs_dir }}/ca.pem"
     dest: "{{ item }}/ca.pem"
     mode: 0644

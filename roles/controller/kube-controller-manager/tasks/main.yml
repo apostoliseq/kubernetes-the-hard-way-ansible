@@ -1,7 +1,7 @@
 ---
 - name: Copy required files to {{ kubernetes_data_dir }}
   become: true
-  copy:
+  ansible.builtin.copy:
     src: "{{ certs_dir }}/kube-controller-manager.kubeconfig"
     dest: "{{ kubernetes_data_dir }}/kube-controller-manager.kubeconfig"
     mode: 0644
@@ -9,7 +9,7 @@
 
 - name: Copy kube-controller-manager in /usr/local/bin
   become: true
-  copy:
+  ansible.builtin.copy:
       src: "{{ downloads_dir }}/kube-controller-manager"
       dest: /usr/local/bin
       owner: root

@@ -1,7 +1,7 @@
 ---
 - name: Ensure required directories exist
   become: true
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     mode: '0755'
@@ -11,7 +11,7 @@
 
 - name: Untar cni-plugins
   become: true
-  unarchive:
+  ansible.builtin.unarchive:
     src: "{{ downloads_dir }}/cni-plugins-amd64-v{{ cni_plugins_version }}.tgz"
     dest: "{{ cni_exec_dir }}"
     extra_opts: [--strip-components=1]

@@ -1,6 +1,6 @@
 - name: Distribute worker certs
   become: true
-  copy:
+  ansible.builtin.copy:
     src: "{{ certs_dir }}/{{ item.file }}"
     dest: "{{ item.dest }}/{{ item.file }}"
     mode: 0644
@@ -15,7 +15,7 @@
 
 - name: Distribute worker kubeconfigs
   become: true
-  copy:
+  ansible.builtin.copy:
     src: "{{ certs_dir }}/{{ item.file }}"
     dest: "{{ item.dest }}/{{ item.file }}"
     mode: 0644
@@ -28,7 +28,7 @@
 
 - name: Copy binaries in /usr/local/bin
   become: true
-  copy:
+  ansible.builtin.copy:
       src: "{{ downloads_dir }}/{{ item }}"
       dest: /usr/local/bin
       mode: '0755'

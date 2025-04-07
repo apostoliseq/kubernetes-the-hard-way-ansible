@@ -1,7 +1,7 @@
 ---
 - name: Ensure required directories
   become: true
-  file:
+  ansible.builtin.file:
     path: "{{ item }}"
     state: directory
     mode: '0755'
@@ -10,7 +10,7 @@
 
 - name: Ensure required files
   become: true
-  copy:
+  ansible.builtin.copy:
     src: "{{ certs_dir }}/{{ item.file }}"
     dest: "{{ item.dest }}"
     mode: 0644

@@ -1,7 +1,7 @@
 ---
 - name: Copy required files to {{ kubernetes_data_dir }}
   become: true
-  copy:
+  ansible.builtin.copy:
     src: "{{ certs_dir }}/kube-scheduler.kubeconfig"
     dest: "{{ kubernetes_data_dir }}/kube-scheduler.kubeconfig"
     remote_src: true
@@ -9,7 +9,7 @@
 
 - name: Ensure /etc/kubernetes/config/kube-scheduler.yaml
   become: true
-  template:
+  ansible.builtin.template:
     src: kube-scheduler.yaml.j2
     dest: /etc/kubernetes/config/kube-scheduler.yaml
     owner: root
@@ -20,7 +20,7 @@
 
 - name: Copy kube-scheduler in /usr/local/bin
   become: true
-  copy:
+  ansible.builtin.copy:
       src: "{{ downloads_dir }}/kube-scheduler"
       dest: /usr/local/bin
       owner: root

@@ -2,17 +2,17 @@
 - name: Ensure dependencies
   hosts: localhost
   roles:
-    - common/dependencies
+    - workstation/dependencies
 
 - name: Generate files
   hosts: localhost
   roles:
-    - common/generate
+    - workstation/generate
 
 - name: Distribute files
   hosts: cluster
   roles:
-    - common/distribute
+    - workstation/distribute
 
 - name: Set up controllers
   hosts: controllers
@@ -66,7 +66,7 @@
             - nginx
 
         - name: Gracefully reload nginx
-          shell: nginx -s reload
+          ansible.builtin.shell: nginx -s reload
           register: controller_nginx
           failed_when: controller_nginx.rc != 0
 
@@ -100,7 +100,7 @@
           state: started
 
       - name: Gracefully reload nginx
-        shell: nginx -s reload
+        ansible.builtin.shell: nginx -s reload
         register: loadbalancer_nginx
         failed_when: loadbalancer_nginx.rc != 0
 
@@ -170,9 +170,9 @@
 - name: Set up workstation
   hosts: localhost
   roles:
-    - access
+    - workstation/access
 
 - name: Cluster services verification checks
   hosts: cluster
   roles:
-    - common/checks
+    - workstation/checks

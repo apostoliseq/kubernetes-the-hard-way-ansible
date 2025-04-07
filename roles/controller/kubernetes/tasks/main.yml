@@ -1,7 +1,7 @@
 ---
 - name: Copy required files to {{ kubernetes_data_dir }}
   become: true
-  copy:
+  ansible.builtin.copy:
     src: "{{ certs_dir }}/{{ item }}"
     dest: "{{ kubernetes_data_dir }}/{{ item }}"
     remote_src: true
@@ -17,7 +17,7 @@
 
 - name: Copy kube-apiserver in /usr/local/bin
   become: true
-  copy:
+  ansible.builtin.copy:
       src: "{{ downloads_dir }}/kube-apiserver"
       dest: /usr/local/bin
       owner: root
