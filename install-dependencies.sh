@@ -21,9 +21,10 @@ cfssl version
 # Install kubectl
 if ! command -V kubectl &> /dev/null; then
 
-    echo "Installing kubectl..."
-    wget https://storage.googleapis.com/kubernetes-release/release/v1.10.2/bin/linux/amd64/kubectl
+    kubectl_version=1.32.0
 
+    echo "Installing kubectl..."
+    wget https://dl.k8s.io/v$kubectl_version/bin/linux/amd64/kubectl
     chmod +x kubectl
 
     sudo mv kubectl /usr/local/bin
