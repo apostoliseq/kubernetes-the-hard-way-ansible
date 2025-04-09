@@ -1,0 +1,100 @@
+---
+- name: Download Weave Net manifest
+  get_url:
+    url: https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
+    dest: /tmp/weave-net.yaml
+
+- name: Modify IPALLOC_RANGE in Weave manifest
+  lineinfile:
+    path: /tmp/weave-net.yaml
+    regexp: '^\s+IPALLOC_RANGE='
+    line: '            - name: IPALLOC_RANGE
+              value: 10.200.0.0/16'
+    state: present
+
+- name: Apply modified Weave Net manifest
+  shell: kubectl apply -f /tmp/weave-net.yaml
+  register: weave_output
+  
+- name: Display Weave installation output
+  ansible.builtin.debug:
+    var: weave_output.stdout_lines
+
+- name: Create nginx deployment
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: nginx
+      spec:
+        selector:
+          matchLabels:
+            run: nginx
+        replicas: 2
+        template:
+          metadata:
+            labels:
+              run: nginx
+          spec:
+            containers:
+            - name: my-nginx
+              image: nginx
+              ports:
+              - containerPort: 80
+
+- name: Expose nginx deployment
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: nginx
+      spec:
+        selector:
+          run: nginx
+        ports:
+        - port: 80
+          protocol: TCP
+          targetPort: 80
+
+- name: Get nginx endpoints
+  k8s_info:
+    api_version: v1
+    kind: Endpoints
+    name: nginx
+  register: nginx_endpoint
+
+- name: Get nginx pod IPs
+  set_fact:
+    NGINX_POD_IPS: "{{ nginx_endpoints.resources[0].subsets[0].addresses | map(attribute='ip') | list }}"
+
+- name: Check access to first nginx pod
+  shell: kubectl exec busybox -- curl {{ NGINX_POD_IPS[0] }}
+  register: curl_pod1
+  
+- name: Display curl output to pod 1
+  debug:
+    var: curl_pod1.stdout_lines
+
+- name: Check access to second nginx pod
+  shell: kubectl exec busybox -- curl {{ NGINX_POD_IPS[1] }}
+  register: curl_pod2
+  
+- name: Display curl output to pod 2
+  debug:
+    var: curl_pod2.stdout_lines
+
+- name: Set nginx service IP
+  set_fact:
+    NGINX_SVC_IP: "{{ nginx_service.resources[0].spec.clusterIP }}"
+
+- name: Check access to nginx service
+  shell: kubectl exec busybox -- curl {{ NGINX_SVC_IP }}
+  register: curl_svc
+  
+- name: Display curl output to service
+  debug:
+    var: curl_svc.stdout_lines

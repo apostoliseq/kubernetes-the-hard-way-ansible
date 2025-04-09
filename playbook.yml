@@ -12,7 +12,7 @@
 - name: Distribute files
   hosts: cluster
   roles:
-    - workstation/distribute
+    - common/distribute
 
 - name: Set up controllers
   hosts: controllers
@@ -167,12 +167,11 @@
             - kube-proxy
             - containerd
 
-- name: Set up workstation
+        - name: Enable IP forwarding
+          ansible.builtin.command: echo "net.ipv4.conf.all.forwarding=1" | sudo tee -a /etc/sysctl.conf
+
+- name: Set up workstation access & networking
   hosts: localhost
   roles:
     - workstation/access
-
-- name: Cluster services verification checks
-  hosts: cluster
-  roles:
-    - workstation/checks
+    - networking
