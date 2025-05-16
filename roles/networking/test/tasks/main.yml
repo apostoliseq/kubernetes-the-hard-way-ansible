@@ -1,79 +1,81 @@
----
-- name: Create nginx deployment
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: apps/v1
-      kind: Deployment
-      metadata:
-        name: nginx
-      spec:
-        selector:
-          matchLabels:
-            run: nginx
-        replicas: 2
-        template:
-          metadata:
-            labels:
-              run: nginx
-          spec:
-            containers:
-            - name: my-nginx
-              image: nginx
-              ports:
-              - containerPort: 80
+# ---
+# - name: Create nginx deployment
+#   kubernetes.core.k8s:
+#     state: present
+#     definition:
+#       apiVersion: apps/v1
+#       kind: Deployment
+#       metadata:
+#         name: nginx
+#         namespace: default
+#       spec:
+#         selector:
+#           matchLabels:
+#             run: nginx
+#         replicas: 2
+#         template:
+#           metadata:
+#             labels:
+#               run: nginx
+#           spec:
+#             containers:
+#             - name: my-nginx
+#               image: nginx
+#               ports:
+#               - containerPort: 80
 
-- name: Expose nginx deployment
-  kubernetes.core.k8s:
-    state: present
-    definition:
-      apiVersion: v1
-      kind: Service
-      metadata:
-        name: nginx
-      spec:
-        selector:
-          run: nginx
-        ports:
-        - port: 80
-          protocol: TCP
-          targetPort: 80
+# - name: Expose nginx deployment
+#   kubernetes.core.k8s:
+#     state: present
+#     definition:
+#       apiVersion: v1
+#       kind: Service
+#       metadata:
+#         name: nginx
+#         namespace: default
+#       spec:
+#         selector:
+#           run: nginx
+#         ports:
+#         - port: 80
+#           protocol: TCP
+#           targetPort: 80
 
-- name: Get nginx endpoints
-  k8s_info:
-    api_version: v1
-    kind: Endpoints
-    name: nginx
-  register: nginx_endpoint
+# - name: Get nginx endpoints
+#   k8s_info:
+#     api_version: v1
+#     kind: Endpoints
+#     name: nginx
+#   register: nginx_endpoint
 
-- name: Get nginx pod IPs
-  set_fact:
-    NGINX_POD_IPS: "{{ nginx_endpoints.resources[0].subsets[0].addresses | map(attribute='ip') | list }}"
+# - name: Get nginx pod IPs
+#   set_fact:
+#     NGINX_POD_IPS: "{{ nginx_endpoints.resources[0].subsets[0].addresses | map(attribute='ip') | list }}"
 
-- name: Check access to first nginx pod
-  shell: kubectl exec busybox -- curl {{ NGINX_POD_IPS[0] }}
-  register: curl_pod1
+# - name: Check access to first nginx pod
+#   shell: kubectl exec busybox -- curl {{ NGINX_POD_IPS[0] }}
+#   register: curl_pod1
   
-- name: Display curl output to pod 1
-  debug:
-    var: curl_pod1.stdout_lines
+# - name: Display curl output to pod 1
+#   debug:
+#     var: curl_pod1.stdout_lines
 
-- name: Check access to second nginx pod
-  shell: kubectl exec busybox -- curl {{ NGINX_POD_IPS[1] }}
-  register: curl_pod2
+# - name: Check access to second nginx pod
+#   shell: kubectl exec busybox -- curl {{ NGINX_POD_IPS[1] }}
+#   register: curl_pod2
   
-- name: Display curl output to pod 2
-  debug:
-    var: curl_pod2.stdout_lines
+# - name: Display curl output to pod 2
+#   debug:
+#     var: curl_pod2.stdout_lines
 
-- name: Set nginx service IP
-  set_fact:
-    NGINX_SVC_IP: "{{ nginx_service.resources[0].spec.clusterIP }}"
+# - name: Set nginx service IP
+#   set_fact:
+#     NGINX_SVC_IP: "{{ nginx_service.resources[0].spec.clusterIP }}"
 
-- name: Check access to nginx service
-  shell: kubectl exec busybox -- curl {{ NGINX_SVC_IP }}
-  register: curl_svc
+# - name: Check access to nginx service
+#   shell: kubectl exec busybox -- curl {{ NGINX_SVC_IP }}
+#   register: curl_svc
   
-- name: Display curl output to service
-  debug:
-    var: curl_svc.stdout_lines
+# - name: Display curl output to service
+#   debug:
+#     var: curl_svc.stdout_lines

@@ -62,4 +62,23 @@ else
     echo "ansible SSH keys already exist, skipping..."
 fi
 
+# Install Python kubernetes module (required for kubernetes.core)
+echo "Installing Python Kubernetes modules..."
+sudo apt update -y
+sudo apt install -y python3-pip
+
+# Try to install via apt first (most reliable system integration)
+sudo apt install -y python3-kubernetes python3-openshift 2>/dev/null || true
+
+# Install via pip with appropriate flags based on pip version
+if python3 -m pip --version | grep -q "pip 23"; then
+    # For newer pip versions (23+) that require --break-system-packages
+    echo "Using newer pip version with --break-system-packages flag"
+    sudo python3 -m pip install kubernetes openshift netaddr --break-system-packages
+else
+    # For older pip versions
+    echo "Using older pip version"
+    sudo python3 -m pip install kubernetes openshift netaddr
+fi
+
 ./set-ips-in-inventory.sh
