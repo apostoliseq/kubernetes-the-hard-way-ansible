@@ -1,25 +1,4 @@
 ---
-- name: Download Weave Net manifest
-  get_url:
-    url: https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
-    dest: /tmp/weave-net.yaml
-
-- name: Modify IPALLOC_RANGE in Weave manifest
-  lineinfile:
-    path: /tmp/weave-net.yaml
-    regexp: '^\s+IPALLOC_RANGE='
-    line: '            - name: IPALLOC_RANGE
-              value: 10.200.0.0/16'
-    state: present
-
-- name: Apply modified Weave Net manifest
-  shell: kubectl apply -f /tmp/weave-net.yaml
-  register: weave_output
-  
-- name: Display Weave installation output
-  ansible.builtin.debug:
-    var: weave_output.stdout_lines
-
 - name: Create nginx deployment
   kubernetes.core.k8s:
     state: present

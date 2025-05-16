@@ -1,0 +1,19 @@
+---
+- name: Download Weave Net manifest
+  get_url:
+    url: https://github.com/weaveworks/weave/releases/download/v2.8.1/weave-daemonset-k8s.yaml
+    dest: /tmp/weave-net.yaml
+
+- name: Modify IPALLOC_RANGE in Weave manifest using sed
+  shell: |
+    sed -i 's/IPALLOC_RANGE=/IPALLOC_RANGE=10.200.0.0\/16/' /tmp/weave-net.yaml
+  register: sed_output
+  changed_when: sed_output.rc == 0
+
+- name: Apply modified Weave Net manifest
+  shell: kubectl apply -f /tmp/weave-net.yaml
+  register: weave_output
+  
+- name: Display Weave installation output
+  ansible.builtin.debug:
+    var: weave_output.stdout_lines

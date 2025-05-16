@@ -25,3 +25,10 @@
     - name: Display script output
       debug:
         var: rm_output.stdout_lines
+
+    - name: Uninstall Weave Net
+      shell: kubectl delete -f /tmp/weave-net.yaml
+
+    - name: Remove /tmp/weave-net.yaml
+      ansible.builtin.shell: rm /tmp/weave-net.yaml
+      ignore_errors: yes
