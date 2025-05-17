@@ -1,174 +1,174 @@
 ---
-# - name: Ensure dependencies
-#   hosts: localhost
-#   roles:
-#     - workstation/dependencies
+- name: Ensure dependencies
+  hosts: localhost
+  roles:
+    - workstation/dependencies
 
-# - name: Generate files
-#   hosts: localhost
-#   roles:
-#     - workstation/generate
+- name: Generate files
+  hosts: localhost
+  roles:
+    - workstation/generate
 
-# - name: Distribute files
-#   hosts: cluster
-#   roles:
-#     - common/distribute
+- name: Distribute files
+  hosts: cluster
+  roles:
+    - common/distribute
 
-# - name: Set up controllers
-#   hosts: controllers
-#   pre_tasks:
-#     - name: Ensure directories
-#       become: true
-#       file:
-#         path: "{{ item }}"
-#         state: directory
-#         mode: '0755'
-#       loop:
-#         - "{{ kubernetes_data_dir }}"
-#         - /etc/kubernetes/config
+- name: Set up controllers
+  hosts: controllers
+  pre_tasks:
+    - name: Ensure directories
+      become: true
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+        - "{{ kubernetes_data_dir }}"
+        - /etc/kubernetes/config
   
-#   roles:
-#     - controller/etcd
-#     - controller/kubernetes
-#     - controller/kube-controller-manager
-#     - controller/kube-scheduler
-#     - nginx
+  roles:
+    - controller/etcd
+    - controller/kubernetes
+    - controller/kube-controller-manager
+    - controller/kube-scheduler
+    - nginx
 
-#   post_tasks:
-#     - name: Ensure service is enabled and running
-#       become: true
-#       block:
-#         - name: Reload systemd daemon
-#           ansible.builtin.systemd:
-#             daemon_reload: yes
-#           changed_when: false
+  post_tasks:
+    - name: Ensure service is enabled and running
+      become: true
+      block:
+        - name: Reload systemd daemon
+          ansible.builtin.systemd:
+            daemon_reload: yes
+          changed_when: false
 
-#         - name: Enable service
-#           ansible.builtin.systemd:
-#             name: "{{ item }}"
-#             enabled: yes
-#           loop:
-#             - etcd
-#             - kube-apiserver
-#             - kube-controller-manager
-#             - kube-scheduler
-#             - nginx
+        - name: Enable service
+          ansible.builtin.systemd:
+            name: "{{ item }}"
+            enabled: yes
+          loop:
+            - etcd
+            - kube-apiserver
+            - kube-controller-manager
+            - kube-scheduler
+            - nginx
 
-#         - name: Start service
-#           ansible.builtin.systemd:
-#             name: "{{ item }}"
-#             state: started
-#           loop:
-#             - etcd
-#             - kube-apiserver
-#             - kube-controller-manager
-#             - kube-scheduler
-#             - nginx
+        - name: Start service
+          ansible.builtin.systemd:
+            name: "{{ item }}"
+            state: started
+          loop:
+            - etcd
+            - kube-apiserver
+            - kube-controller-manager
+            - kube-scheduler
+            - nginx
 
-#         - name: Gracefully reload nginx
-#           ansible.builtin.shell: nginx -s reload
-#           register: controller_nginx
-#           failed_when: controller_nginx.rc != 0
+        - name: Gracefully reload nginx
+          ansible.builtin.shell: nginx -s reload
+          register: controller_nginx
+          failed_when: controller_nginx.rc != 0
 
-# - name: Set up RBAC
-#   hosts: kube-controller-1
-#   roles:
-#     - rbac
+- name: Set up RBAC
+  hosts: kube-controller-1
+  roles:
+    - rbac
 
-# - name: Set up Load Balancer
-#   hosts: loadbalancer
-#   roles:
-#     - nginx
+- name: Set up Load Balancer
+  hosts: loadbalancer
+  roles:
+    - nginx
 
-#   post_tasks:
-#   - name: Ensure service is enabled and running
-#     become: true
-#     block:
-#       - name: Reload systemd daemon
-#         ansible.builtin.systemd:
-#           daemon_reload: yes
-#         changed_when: false
+  post_tasks:
+  - name: Ensure service is enabled and running
+    become: true
+    block:
+      - name: Reload systemd daemon
+        ansible.builtin.systemd:
+          daemon_reload: yes
+        changed_when: false
 
-#       - name: Enable service
-#         ansible.builtin.systemd:
-#           name: nginx
-#           enabled: yes
+      - name: Enable service
+        ansible.builtin.systemd:
+          name: nginx
+          enabled: yes
 
-#       - name: Start service
-#         ansible.builtin.systemd:
-#           name: nginx
-#           state: started
+      - name: Start service
+        ansible.builtin.systemd:
+          name: nginx
+          state: started
 
-#       - name: Gracefully reload nginx
-#         ansible.builtin.shell: nginx -s reload
-#         register: loadbalancer_nginx
-#         failed_when: loadbalancer_nginx.rc != 0
+      - name: Gracefully reload nginx
+        ansible.builtin.shell: nginx -s reload
+        register: loadbalancer_nginx
+        failed_when: loadbalancer_nginx.rc != 0
 
-# - name: Set up workers
-#   hosts: workers
-#   pre_tasks:
-#     - name: Ensure directories
-#       become: true
-#       file:
-#         path: "{{ item }}"
-#         state: directory
-#         mode: '0755'
-#       loop:
-#       - "{{ kubernetes_data_dir }}"
-#       - /var/run/kubernetes
+- name: Set up workers
+  hosts: workers
+  pre_tasks:
+    - name: Ensure directories
+      become: true
+      file:
+        path: "{{ item }}"
+        state: directory
+        mode: '0755'
+      loop:
+      - "{{ kubernetes_data_dir }}"
+      - /var/run/kubernetes
 
-#     - name: Ensure dependencies
-#       become: true
-#       ansible.builtin.package:
-#         name: "{{ item }}"
-#         state: present
-#       loop:
-#       - socat
-#       - conntrack
-#       - ipset
+    - name: Ensure dependencies
+      become: true
+      ansible.builtin.package:
+        name: "{{ item }}"
+        state: present
+      loop:
+      - socat
+      - conntrack
+      - ipset
 
-#     - name: Untar crictl
-#       become: true
-#       unarchive:
-#         src: "{{ downloads_dir }}/crictl-v{{ crictl_version }}-linux-amd64.tar.gz"
-#         dest: /usr/local/bin
-#         mode: '0755'
+    - name: Untar crictl
+      become: true
+      unarchive:
+        src: "{{ downloads_dir }}/crictl-v{{ crictl_version }}-linux-amd64.tar.gz"
+        dest: /usr/local/bin
+        mode: '0755'
 
-#   roles:
-#     - worker/cni-plugins
-#     - worker/containerd
-#     - worker/kubelet
-#     - worker/kube-proxy
+  roles:
+    - worker/cni-plugins
+    - worker/containerd
+    - worker/kubelet
+    - worker/kube-proxy
 
-#   post_tasks:
-#     - name: Ensure service is enabled and running
-#       become: true
-#       block:
-#         - name: Reload systemd daemon
-#           ansible.builtin.systemd:
-#             daemon_reload: yes
-#           changed_when: false
+  post_tasks:
+    - name: Ensure service is enabled and running
+      become: true
+      block:
+        - name: Reload systemd daemon
+          ansible.builtin.systemd:
+            daemon_reload: yes
+          changed_when: false
 
-#         - name: Enable service
-#           ansible.builtin.systemd:
-#             name: "{{ item }}"
-#             enabled: yes
-#           loop:
-#             - kubelet
-#             - kube-proxy
-#             - containerd
+        - name: Enable service
+          ansible.builtin.systemd:
+            name: "{{ item }}"
+            enabled: yes
+          loop:
+            - kubelet
+            - kube-proxy
+            - containerd
 
-#         - name: Start service
-#           ansible.builtin.systemd:
-#             name: "{{ item }}"
-#             state: started
-#           loop:
-#             - kubelet
-#             - kube-proxy
-#             - containerd
+        - name: Start service
+          ansible.builtin.systemd:
+            name: "{{ item }}"
+            state: started
+          loop:
+            - kubelet
+            - kube-proxy
+            - containerd
 
-#         - name: Enable IP forwarding
-#           ansible.builtin.command: echo "net.ipv4.conf.all.forwarding=1" | sudo tee -a /etc/sysctl.conf
+        - name: Enable IP forwarding
+          ansible.builtin.command: echo "net.ipv4.conf.all.forwarding=1" | sudo tee -a /etc/sysctl.conf
 
 - name: Set up workstation access & networking
   hosts: localhost

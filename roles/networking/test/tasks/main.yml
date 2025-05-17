@@ -1,52 +1,57 @@
-# ---
-# - name: Create nginx deployment
-#   kubernetes.core.k8s:
-#     state: present
-#     definition:
-#       apiVersion: apps/v1
-#       kind: Deployment
-#       metadata:
-#         name: nginx
-#         namespace: default
-#       spec:
-#         selector:
-#           matchLabels:
-#             run: nginx
-#         replicas: 2
-#         template:
-#           metadata:
-#             labels:
-#               run: nginx
-#           spec:
-#             containers:
-#             - name: my-nginx
-#               image: nginx
-#               ports:
-#               - containerPort: 80
+---
+- name: Create nginx deployment
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: apps/v1
+      kind: Deployment
+      metadata:
+        name: nginx
+        namespace: default
+      spec:
+        selector:
+          matchLabels:
+            run: nginx
+        replicas: 2
+        template:
+          metadata:
+            labels:
+              run: nginx
+          spec:
+            containers:
+            - name: my-nginx
+              image: nginx
+              ports:
+              - containerPort: 80
 
-# - name: Expose nginx deployment
-#   kubernetes.core.k8s:
-#     state: present
-#     definition:
-#       apiVersion: v1
-#       kind: Service
-#       metadata:
-#         name: nginx
-#         namespace: default
-#       spec:
-#         selector:
-#           run: nginx
-#         ports:
-#         - port: 80
-#           protocol: TCP
-#           targetPort: 80
+- name: Expose nginx deployment
+  kubernetes.core.k8s:
+    state: present
+    definition:
+      apiVersion: v1
+      kind: Service
+      metadata:
+        name: nginx
+        namespace: default
+      spec:
+        selector:
+          run: nginx
+        ports:
+        - port: 80
+          protocol: TCP
+          targetPort: 80
 
-# - name: Get nginx endpoints
-#   k8s_info:
-#     api_version: v1
-#     kind: Endpoints
-#     name: nginx
-#   register: nginx_endpoint
+- name: Get nginx endpoints
+  k8s_info:
+    api_version: v1
+    kind: Endpoints
+    name: nginx
+    namespace: default
+  register: nginx_endpoints
+
+- name: debug endpoints
+  debug:
+    var: nginx_endpoints.resources[0].subsets[0].addresses | map(attribute='ip') | list
 
 # - name: Get nginx pod IPs
 #   set_fact:

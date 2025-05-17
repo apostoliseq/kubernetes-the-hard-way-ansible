@@ -1,4 +1,0 @@
-# Best for: Per-host customization.
-# containerd_dir: "/etc/containerd"
-# kube_proxy_data_dir: "/var/lib/kube-proxy"
-# kubelet_data_dir: "/var/lib/kubelet"
